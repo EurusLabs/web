@@ -9,9 +9,30 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  output: 'export',
-  trailingSlash: true,
-  distDir: 'out',
+  // Only enable static export for production builds
+  ...(process.env.NODE_ENV === 'production' && {
+    output: 'export',
+    trailingSlash: true,
+    distDir: 'out',
+  }),
+  // Exclude problematic files from file watching
+  webpack: (config, { dev, isServer }) => {
+    if (dev) {
+      config.watchOptions = {
+        ...config.watchOptions,
+        ignored: [
+          '**/node_modules',
+          '**/.git',
+          '**/.next',
+          '**/out',
+          '**/.DS_Store',
+          '**/Thumbs.db',
+          '**/*.log',
+        ],
+      }
+    }
+    return config
+  },
 }
 
 export default nextConfig

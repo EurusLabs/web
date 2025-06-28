@@ -1,5 +1,5 @@
 import type React from "react"
-import NewspieceDetailClient from './newspiece-detail-client'
+import NewspieceDetailClient from './newspiece-detail-client' // Import the client component
 
 // Generate static params for all newspieces
 export async function generateStaticParams() {
