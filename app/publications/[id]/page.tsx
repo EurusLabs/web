@@ -3,6 +3,7 @@
 import { ResearchPostContent } from "@/components/research-post-content"
 import Navigation from "../../components/navigation"
 import { useRouter } from "next/navigation"
+import { publicationsData } from "@/components/publications-data"
 
 export default function ResearchPostPage({ params }: { params: { id: string } }) {
   const { id } = params
@@ -23,4 +24,8 @@ export default function ResearchPostPage({ params }: { params: { id: string } })
       </main>
     </div>
   )
+}
+
+export async function generateStaticParams() {
+  return publicationsData.map(pub => ({ id: pub.id }))
 }
