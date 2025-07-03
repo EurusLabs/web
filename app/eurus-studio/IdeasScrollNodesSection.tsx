@@ -42,7 +42,7 @@ export default function IdeasScrollNodesSection() {
                 style={{ width: 320, height: 320 }}
               >
                 <img
-                  src="/images/oldman1.png"
+                  src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/oldman1.png"
                   alt="Old Man 1"
                   className="w-full h-full object-cover rounded-xl border-2 border-white shadow-2xl"
                 />
@@ -55,7 +55,7 @@ export default function IdeasScrollNodesSection() {
                 style={{ width: 320, height: 320 }}
               >
                 <img
-                  src="/images/oldman2.jpg"
+                  src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/oldman2.jpg"
                   alt="Old Man 2"
                   className="w-full h-full object-cover rounded-xl border-2 border-white shadow-2xl"
                 />
@@ -68,7 +68,7 @@ export default function IdeasScrollNodesSection() {
                 style={{ width: 320, height: 320 }}
               >
                 <video
-                  src="/images/oldman3.mp4"
+                  src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/oldman3.mp4"
                   className="w-full h-full object-cover rounded-xl border-2 border-white shadow-2xl"
                   autoPlay
                   loop

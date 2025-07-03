@@ -511,10 +511,10 @@ function ProductsScrollSectionLanding() {
 // Add this new component for the landing page
 function ProductsScrollSectionStudioLanding() {
   const products = [
-    { name: 'Eidos', videoSrc: '/images/abstract4.mp4', description: 'Eidos is the world-leading generative AI for text, code, and more.', link: '/eidos' },
-    { name: 'Relay', videoSrc: '/images/abstract1.mp4', description: 'Relay brings next-gen video and image generation to creators.', link: '/relay' },
-    { name: 'Studio', videoSrc: '/images/abstract3.mp4', description: 'Studio is a powerful AI for video understanding and creative editing.', link: '/studio' },
-    { name: 'Draft', videoSrc: '/images/abstract2.mp4', description: 'Draft enables advanced audio and speech synthesis for your projects.', link: '/draft' },
+    { name: 'Eidos', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract4.mp4', description: 'Eidos is the world-leading generative AI for text, code, and more.', link: '/eidos' },
+    { name: 'Relay', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract1.mp4', description: 'Relay brings next-gen video and image generation to creators.', link: '/relay' },
+    { name: 'Studio', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract3.mp4', description: 'Studio is a powerful AI for video understanding and creative editing.', link: '/studio' },
+    { name: 'Draft', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract2.mp4', description: 'Draft enables advanced audio and speech synthesis for your projects.', link: '/draft' },
   ];
   const [current, setCurrent] = React.useState(0);
   const containerRef = React.useRef<HTMLDivElement>(null);

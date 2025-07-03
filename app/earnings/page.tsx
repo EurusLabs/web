@@ -36,7 +36,7 @@ function EarningsContent() {
           }
         }}
       >
-        <source src="/hero.mp4" type="video/mp4" />
+        <source src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/hero.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
@@ -120,7 +120,7 @@ function EarningsContent() {
         {/* Creator Card - keeping from original home page */}
         <div className="fixed bottom-8 right-8 bg-black/60 backdrop-blur-sm rounded-2xl p-4 flex items-center space-x-4 max-w-sm">
           <Avatar className="w-12 h-12">
-            <AvatarImage src="/person.jpg" alt="Janine Kresky" />
+            <AvatarImage src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/person.jpg" alt="Janine Kresky" />
             <AvatarFallback>JK</AvatarFallback>
           </Avatar>
           <div className="flex-1">

@@ -9,7 +9,7 @@ export default function LatentLoopOptimizationPost() {
       {/* Image under title */}
       <div className="mb-8 w-full flex justify-center">
         <img
-          src="/images/2.jpg"
+          src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/2.jpg"
           alt="Latent Loop Optimization concept"
           className="aspect-square object-cover w-full h-auto rounded-lg"
         />

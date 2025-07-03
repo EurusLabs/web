@@ -128,11 +128,11 @@ export default function EurusStudioPage() {
 
 function ProductsScrollSectionStudio() {
   const products = [
-    { name: 'GPT', videoSrc: '/images/person1.mp4', description: 'GPT is the world-leading generative AI for text, code, and more.' },
-    { name: 'Runway Gen-4', videoSrc: '/images/person3.mp4', description: 'Runway Gen-4 brings next-gen video and image generation to creators.' },
-    { name: 'Veo 3', videoSrc: '/images/peron2.mp4', description: 'Veo 3 is a powerful AI for video understanding and creative editing.' },
-    { name: 'Kling', videoSrc: '/images/person4.mp4', description: 'Kling enables advanced audio and speech synthesis for your projects.' },
-    { name: 'Luma ray 2', videoSrc: '/images/peron5.mp4', description: 'Luma ray 2 delivers photorealistic 3D and lighting effects with AI.' },
+    { name: 'GPT', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person1.mp4', description: 'GPT is the world-leading generative AI for text, code, and more.' },
+    { name: 'Runway Gen-4', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person3.mp4', description: 'Runway Gen-4 brings next-gen video and image generation to creators.' },
+    { name: 'Veo 3', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/peron2.mp4', description: 'Veo 3 is a powerful AI for video understanding and creative editing.' },
+    { name: 'Kling', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person4.mp4', description: 'Kling enables advanced audio and speech synthesis for your projects.' },
+    { name: 'Luma ray 2', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/peron5.mp4', description: 'Luma ray 2 delivers photorealistic 3D and lighting effects with AI.' },
   ];
   
   const [current, setCurrent] = React.useState(0);
@@ -514,14 +514,14 @@ function DraggableNodesLayer() {
             style={{ pointerEvents: 'auto', transition: draggingId === node.id ? 'none' : 'transform 0.2s ease-out, box-shadow 0.2s ease-out' }}
           >
             {node.type === 'image' && (
-              <img src="/Gemini_Generated_Image_gyykvsgyykvsgyyk.png" alt="img" className="w-full h-full object-cover rounded-xl" />
+              <img src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/Gemini_Generated_Image_gyykvsgyykvsgyyk.png" alt="img" className="w-full h-full object-cover rounded-xl" />
             )}
             {node.type === 'lut' && (
-              <img src="/Whisk_storyboardf6f725941f3d455ebcef84c1.png" alt="lut" className="w-full h-full object-cover rounded-xl" />
+              <img src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/Whisk_storyboardf6f725941f3d455ebcef84c1.png" alt="lut" className="w-full h-full object-cover rounded-xl" />
             )}
             {node.type === 'video' && (
               <video 
-                src="/images/colour.mp4" 
+                src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/colour.mp4" 
                 className="w-full h-full object-cover rounded-lg" 
                 autoPlay 
                 loop 
