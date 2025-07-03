@@ -402,7 +402,7 @@ function DraggableNodesLayer() {
               <img src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/placeholder.jpg" alt="img" className="w-full h-full object-cover rounded-xl" />
             )}
             {node.type === 'lut' && (
-              <img src="/lut-gradient.png" alt="lut" className="w-full h-full object-cover rounded-xl" />
+              <img src="/images/Whisk_storyboardba84c432eb1e4db5a2dfcd4b.png" alt="lut" className="w-full h-full object-cover rounded-xl" />
             )}
             {node.type === 'video' && (
               <video src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/1.mp4" className="w-full h-full object-cover rounded-lg" autoPlay loop muted playsInline />
