@@ -10,11 +10,11 @@ const nextConfig = {
     unoptimized: true,
   },
   // Only enable static export for production builds
-  ...(process.env.NODE_ENV === 'production' && {
-    output: 'export',
-    trailingSlash: true,
-    distDir: 'out',
-  }),
+  // ...(process.env.NODE_ENV === 'production' && {
+  //   output: 'export',
+  //   trailingSlash: true,
+  //   distDir: 'out',
+  // }),
   // Exclude problematic files from file watching
   webpack: (config, { dev, isServer }) => {
     if (dev) {
