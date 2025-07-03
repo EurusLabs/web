@@ -18,155 +18,43 @@ export default function Footer() {
   }
 
   return (
-    <>
-      {/* Recently Out Section */}
-      {/* <section className="bg-background text-foreground w-full py-20"> ... </section> */}
-
-      {/* Made with Eurus Section */}
-      {/* <section className="w-full py-20 text-foreground"> ... </section> */}
-
-      <footer className="relative bg-background text-foreground z-10 text-foreground">
-      {/* Main Footer Content */}
-      <div className="relative px-6 py-16 md:px-12 lg:px-24">
-        <div className="max-w-7xl mx-auto">
-          {/* Footer Links Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16 justify-center text-center">
-            {/* Products */}
-              <div className="flex flex-col items-center text-center">
-                <h3 className="text-sm font-semibold text-foreground/400 uppercase tracking-wider mb-6">
-                PRODUCTS
-              </h3>
-              <ul className="space-y-4">
-                <li>
-                    <Link href="/eurus-studio" className="text-foreground hover:text-foreground/300 transition-colors duration-200">
-                      Studio
-                  </Link>
-                </li>
-                <li>
-                  <a 
-                    href="http://localhost:3001" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                      className="text-foreground hover:text-foreground/300 transition-colors duration-200"
-                  >
-                      Write
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="https://www.relayedstories.com/" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                      className="text-foreground hover:text-foreground/300 transition-colors duration-200"
-                  >
-                    Relay
-                  </a>
-                </li>
-                  <li>
-                    <Link href="/discover" className="text-foreground hover:text-foreground/300 transition-colors duration-200">
-                      Eidos
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Company */}
-              <div className="flex flex-col items-center text-center">
-                <h3 className="text-sm font-semibold text-foreground/400 uppercase tracking-wider mb-6">
-                COMPANY
-              </h3>
-              <ul className="space-y-4">
-                <li>
-                    <Link href="/manifesto" className="text-foreground hover:text-foreground/300 transition-colors duration-200">
-                    Manifesto
-                  </Link>
-                </li>
-                <li>
-                    <Link href="/careers" className="text-foreground hover:text-foreground/300 transition-colors duration-200">
-                    Careers
-                  </Link>
-                </li>
-                <li>
-                    <Link href="/community" className="text-foreground hover:text-foreground/300 transition-colors duration-200">
-                    Community
-                  </Link>
-                </li>
-                  <li>
-                    <a 
-                      href="https://eurus-labs.gitbook.io/eurus-labs/" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-foreground hover:text-foreground/300 transition-colors duration-200"
-                    >
-                      Documentation
-                    </a>
-                  </li>
-              </ul>
-            </div>
-
-            {/* Social */}
-              <div className="flex flex-col items-center text-center">
-                <h3 className="text-sm font-semibold text-foreground/400 uppercase tracking-wider mb-6">
-                SOCIAL
-              </h3>
-              <ul className="space-y-4">
-                <li>
-                  <a 
-                    href="#" 
-                      className="text-foreground hover:text-foreground/300 transition-colors duration-200"
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
-                    LinkedIn
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="#" 
-                      className="text-foreground hover:text-foreground/300 transition-colors duration-200"
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
-                    X (Twitter)
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="#" 
-                      className="text-foreground hover:text-foreground/300 transition-colors duration-200"
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
-                    YouTube
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom Section */}
-            <div className="flex flex-col justify-center items-center pt-8 border-t border-foreground/80 text-center">
-            {/* Logo */}
-              <div className="mb-6">
-                <Link href="/" className="text-foreground text-2xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-                  Eurus Labs
-              </Link>
-            </div>
-
-            {/* Legal Links */}
-              <div className="flex flex-col md:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-8 text-sm text-foreground/60">
-                <Link href="/privacy" className="hover:text-foreground transition-colors duration-200">
-                Privacy Policy
-              </Link>
-                <Link href="/terms" className="hover:text-foreground transition-colors duration-200">
-                Terms of Use
-              </Link>
-              <span>©Eurus Labs Inc</span>
-            </div>
-          </div>
+    <footer className="w-full bg-black text-white py-6 px-8 flex flex-row items-center justify-between" style={{ minHeight: '64px' }}>
+      {/* Verticals - left aligned */}
+      <div className="flex flex-row items-start gap-12">
+        {/* Products vertical */}
+        <div className="flex flex-col items-start gap-2">
+          <div className="font-bold text-lg">PRODUCTS</div>
+          <a href="/studio" className="hover:underline">Studio</a>
+          <a href="/draft" className="hover:underline">Draft</a>
+          <a href="/relay" className="hover:underline">Relay</a>
+          <a href="/eidos" className="hover:underline">Eidos</a>
+        </div>
+        {/* Company vertical */}
+        <div className="flex flex-col items-start gap-2">
+          <div className="font-bold text-lg">COMPANY</div>
+          <a href="/about" className="hover:underline">About</a>
+          <a href="/careers" className="hover:underline">Careers</a>
+          <a href="/contact" className="hover:underline">Contact</a>
+        </div>
+        {/* Social vertical */}
+        <div className="flex flex-col items-start gap-2">
+          <div className="font-bold text-lg">SOCIAL</div>
+          <a href="https://x.com/eurus_labs" target="_blank" rel="noopener noreferrer" className="hover:underline">X</a>
+          <a href="https://www.linkedin.com/company/euruslabs/" target="_blank" rel="noopener noreferrer" className="hover:underline">LinkedIn</a>
+          <a href="https://github.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">GitHub</a>
+          <a href="https://www.instagram.com/euruslabs/" target="_blank" rel="noopener noreferrer" className="hover:underline">Instagram</a>
         </div>
       </div>
+      {/* Centered right-aligned legal row */}
+      <div className="flex flex-row items-center gap-4 ml-auto" style={{ textAlign: 'center' }}>
+        <span>Eurus Labs</span>
+        <span>|</span>
+        <a href="/privacy" className="hover:underline">Privacy Policy</a>
+        <span>|</span>
+        <a href="/terms" className="hover:underline">Terms of Use</a>
+        <span>|</span>
+        <span>©Eurus Labs Inc</span>
+      </div>
     </footer>
-    </>
   )
 } 

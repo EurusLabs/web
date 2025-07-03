@@ -138,7 +138,7 @@ export default function GetStartedPage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen flex bg-black text-white">
       {/* Left Side - Image with Text Overlay */}
       <div className="flex-1 relative overflow-hidden">
         {/* Background Images */}
@@ -158,11 +158,11 @@ export default function GetStartedPage() {
         ))}
         
         {/* Overlay */}
-        <div className="absolute inset-0 bg-background/40" />
+        <div className="absolute inset-0 bg-black/40" />
         
         {/* Text Content */}
         <div className="absolute inset-0 flex items-center justify-center p-12">
-          <div className="text-center text-foreground max-w-lg">
+          <div className="text-center text-white max-w-lg">
             <h1 className="text-5xl font-light mb-6 leading-tight">
               Everything you need,<br />
               to make anything you<br />
@@ -178,19 +178,19 @@ export default function GetStartedPage() {
         
         {/* Logo */}
         <div className="absolute top-8 left-8">
-          <h2 className="text-foreground text-2xl font-light">Eurus Labs</h2>
+          <h2 className="text-white text-2xl font-light">Eurus Labs</h2>
         </div>
       </div>
 
       {/* Right Side - Get Started Form */}
-      <div className="flex-1 bg-background flex items-center justify-center p-12">
+      <div className="flex-1 bg-black flex items-center justify-center p-12">
         <div className="w-full max-w-sm">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-semibold text-foreground mb-2">
+            <h1 className="text-3xl font-semibold text-white mb-2">
               Start creating on Eurus Labs
             </h1>
-            <p className="text-foreground/70">
+            <p className="text-white/70">
               Join 250,000+ creators building fandoms, earning from memberships, and selling digital products.
             </p>
           </div>
@@ -224,7 +224,7 @@ export default function GetStartedPage() {
 
           {/* Divider */}
           <div className="text-center mb-6">
-            <span className="text-foreground/50 text-sm">OR</span>
+            <span className="text-white/50 text-sm">OR</span>
           </div>
 
           {/* Social Login Buttons */}

@@ -17,7 +17,7 @@ const manifestoPoints = [
 
 export default function ManifestoPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-black text-white">
       <Navigation />
       <main className="flex flex-col items-center justify-center pt-32 pb-24 px-4 w-full">
         <h1 className="text-6xl md:text-8xl font-black mb-16 text-center tracking-tight" style={{ fontFamily: 'var(--font-sf-pro)' }}>

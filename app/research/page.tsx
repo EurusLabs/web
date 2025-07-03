@@ -130,7 +130,7 @@ export default function ResearchPage() {
   if (!hydrated) return null // Prevent SSR mismatch
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-black text-white">
       <Navigation />
       
       {/* Main Content */}

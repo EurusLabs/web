@@ -9,7 +9,7 @@ export default function ResearchPostPage({ params }: { params: { id: string } })
   // const router = useRouter()
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-black text-white">
       <Navigation />
       <main className="pt-24 pb-16 px-6 md:px-12 lg:px-24 max-w-4xl mx-auto">
         <BackButton />

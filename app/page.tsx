@@ -11,6 +11,9 @@ import Link from "next/link"
 import Footer from "@/components/footer"
 import { EurusStudiosSection } from "@/app/components/eurus-studios-section"
 import NoSsr from "./components/NoSsr"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { publicationsData } from "@/components/publications-data"
+import { FaArrowRight } from "react-icons/fa"
 
 export default function Home() {
   return (
@@ -243,7 +246,17 @@ function HomePage() {
     }
   }, [])
 
+  // --- Recently Out Tabs ---
+  const tabCategories = [
+    "All", "Research", "Blog", "Announcements", "Guides", "Updates"
+  ];
+  const [activeTab, setActiveTab] = useState("All");
+  const filteredPublications = activeTab === "All"
+    ? publicationsData
+    : publicationsData.filter(pub => pub.category?.toLowerCase() === activeTab.toLowerCase());
+
   return (
+    <div>
     <div className="main-content-container">
       <div className="scroll-snap-container">
         {/* First Page - Hero Section */}
@@ -350,79 +363,312 @@ function HomePage() {
               </h1>
             </div>
           </div>
-
-          {/* Client Testimonial Card */}
-          <div className="fixed bottom-8 right-8 bg-card/80 backdrop-blur-sm rounded-2xl p-4 flex items-center space-x-4 max-w-sm z-40">
-            <Avatar className="w-12 h-12">
-              <AvatarImage src={testimonials[currentTestimonialIndex].image} alt={testimonials[currentTestimonialIndex].name} />
-              <AvatarFallback>{testimonials[currentTestimonialIndex].name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <p className="text-foreground text-sm font-medium mb-2" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-                "{testimonials[currentTestimonialIndex].quote}"
-              </p>
-              <p className="text-foreground/70 text-xs font-medium" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-                — {testimonials[currentTestimonialIndex].name}
-              </p>
-            </div>
-          </div>
         </div>
 
         {/* Second Page - Eurus Studios Section */}
         <EurusStudiosSection />
 
-        {/* Third Page - Products Scroll Section */}
-        <div className="min-h-screen relative scroll-snap-section flex flex-col justify-center overflow-hidden">
-          <ProductsScrollSection />
+          {/* Studio-style Product Scroll Section (duplicated from Eurus Studio) */}
+          <ProductsScrollSectionStudioLanding />
+
+          {/* Recently Out Section */}
+          <section className="bg-background text-foreground w-full py-20 flex flex-col items-center justify-center">
+            <div className="flex items-center justify-center mb-12 gap-3">
+              <h2 className="text-4xl font-bold text-center" style={{ fontFamily: 'var(--font-sf-pro)' }}>Recently Out</h2>
+              <Link href="/research" className="flex items-center group">
+                <span className="sr-only">Go to Research</span>
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-5xl mx-auto w-full">
+              {/* Use original titles/types/dates/links, but swap images */}
+              {publicationsData.slice(0, 4).map((pub, idx) => (
+                <div key={pub.id} className="flex flex-col items-center">
+                  <img src={`/images/${idx + 1}.jpg`} alt={pub.title} className="w-full aspect-square object-cover rounded-lg mb-4" />
+                  <div className="text-lg font-semibold text-foreground mb-1 text-center" style={{ fontFamily: 'var(--font-sf-pro)' }}>{pub.title}</div>
+                  <div className="text-sm text-muted-foreground text-center">{pub.type} {pub.date}</div>
+                  <a href={pub.readPaperLink || '#'} className="text-primary font-semibold flex items-center gap-2 hover:underline mt-2">Read More</a>
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
     </div>
   )
 }
 
-function ProductsScrollSection() {
+function ProductsScrollSectionLanding() {
   const products = [
-    { name: 'Studio', imgSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/wave-glass.jpg', description: 'Studio is your all-in-one creative suite for audio and video production, designed for storytellers and creators.' },
-    { name: 'Write', imgSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/glass-blobs.jpg', description: 'Write is a next-gen writing and publishing platform for creators, teams, and communities.' },
-    { name: 'Relay', imgSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/color-flower-1.jpg', description: 'Relay lets you share, distribute, and monetize your stories and podcasts across platforms.' },
-    { name: 'Eidos', imgSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/color-flower-2.jpg', description: "Eidos is where you discover, listen, and connect with the world's best creators and their content." },
+    { name: 'Studio', imgSrc: '/wave-glass.jpg', description: 'Studio is your all-in-one creative suite for audio and video production, designed for storytellers and creators.' },
+    { name: 'Draft', imgSrc: '/glass-blobs.jpg', description: 'Draft is a next-gen writing and publishing platform for creators, teams, and communities.' },
+    { name: 'Relay', imgSrc: '/color-flower-1.jpg', description: 'Relay lets you share, distribute, and monetize your stories and podcasts across platforms.' },
+    { name: 'Eidos', imgSrc: '/color-flower-2.jpg', description: "Eidos is where you discover, listen, and connect with the world's best creators and their content." },
   ];
-  const [selected, setSelected] = React.useState(0);
+  const [current, setCurrent] = React.useState(0);
+  const sectionRefs = React.useRef<HTMLDivElement[]>([]);
+  const nameRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
+  const [highlightStyle, setHighlightStyle] = React.useState<{top: number, height: number}>({top: 0, height: 0});
+
+  React.useEffect(() => {
+    const handleScroll = (e: Event) => {
+      const container = e.target as HTMLDivElement;
+      const containerRect = container.getBoundingClientRect();
+      const containerCenter = containerRect.top + containerRect.height / 2;
+      let minDistance = Infinity;
+      let found = 0;
+      sectionRefs.current.forEach((ref, idx) => {
+        if (ref) {
+          const rect = ref.getBoundingClientRect();
+          const sectionCenter = rect.top + rect.height / 2;
+          const distance = Math.abs(sectionCenter - containerCenter);
+          if (distance < minDistance) {
+            minDistance = distance;
+            found = idx;
+          }
+        }
+      });
+      setCurrent(found);
+    };
+    const container = document.getElementById('products-scroll-viewport');
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      handleScroll({ target: container } as unknown as Event);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    function updateHighlight() {
+      const el = nameRefs.current[current];
+      if (el) {
+        const parent = el.parentElement;
+        if (parent) {
+          const parentRect = parent.getBoundingClientRect();
+          const elRect = el.getBoundingClientRect();
+          setHighlightStyle({
+            top: elRect.top - parentRect.top,
+            height: elRect.height,
+          });
+        }
+      }
+    }
+    updateHighlight();
+    window.addEventListener('resize', updateHighlight);
+    return () => window.removeEventListener('resize', updateHighlight);
+  }, [current]);
+
+  const VISIBLE_COUNT = products.length;
+  const NAME_HEIGHT = 72;
+  const containerHeight = NAME_HEIGHT * VISIBLE_COUNT;
+  const translateY = -(current * NAME_HEIGHT - (containerHeight / 2 - NAME_HEIGHT / 2));
 
   return (
-    <div className="relative w-screen h-screen flex items-stretch overflow-hidden">
-      {/* Background Image */}
+    <div id="products-scroll-viewport" className="w-full h-full relative overflow-hidden">
+      {products.map((product, idx) => (
       <img
-        src={products[selected].imgSrc}
-        alt={products[selected].name}
-        className="absolute inset-0 w-full h-full object-cover transition-all duration-500 z-0"
-        style={{ opacity: 1 }}
-      />
-      {/* Overlay for better text visibility */}
-      <div className="absolute inset-0 bg-black/40 z-10" />
-      {/* Vertical Product Names - left side */}
-      <div className="relative z-20 flex flex-col justify-center items-start h-full px-10 gap-4 md:gap-8 flex-1">
-        {products.map((product, idx) => (
-          <button
-            key={product.name}
-            onClick={() => setSelected(idx)}
-            className={`text-5xl md:text-7xl font-bold transition-all duration-200 focus:outline-none text-left ${selected === idx ? 'text-white' : 'text-white/60'}`}
-            style={{ fontFamily: 'var(--font-sf-pro)', opacity: selected === idx ? 1 : 0.6 }}
+          key={product.name}
+          src={product.imgSrc}
+          alt={product.name}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 z-0 ${current === idx ? 'opacity-100' : 'opacity-0'}`}
+          style={{ pointerEvents: 'none' }}
+        />
+      ))}
+      <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
+      <div className="absolute left-10 top-1/2 -translate-y-1/2 z-20" style={{ pointerEvents: 'none' }}>
+      </div>
+      <div className="absolute right-10 top-1/2 -translate-y-1/2 flex flex-col items-end gap-2 z-20" style={{ pointerEvents: 'none' }}>
+        {products.map((p, i) => (
+          <span
+            key={p.name}
+            className={`text-5xl md:text-7xl font-bold transition-all duration-300 text-right ${current === i ? 'text-yellow-200' : 'text-white/80'}`}
+            style={{ fontFamily: 'var(--font-sf-pro)', opacity: current === i ? 1 : 0.7 }}
           >
-            {product.name}
-          </button>
+            {p.name}
+          </span>
         ))}
       </div>
-      {/* Product Description - right side, just text, no box, with arrow */}
-      <div className="absolute right-10 top-1/2 transform -translate-y-1/2 z-20 max-w-lg text-right flex flex-col items-end">
-        <p className="text-2xl md:text-3xl font-semibold mb-2 text-white drop-shadow-lg" style={{ fontFamily: 'var(--font-sf-pro)' }}>{products[selected].name}</p>
-        <p className="text-lg md:text-xl text-white drop-shadow-lg mb-4" style={{ fontFamily: 'var(--font-sf-pro)' }}>{products[selected].description}</p>
-        <span className="flex justify-center w-full">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6 10L12 16L18 10" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </span>
+      <div className="absolute inset-0 w-full h-full z-30" style={{ pointerEvents: 'auto' }}>
+        <div className="h-full w-full flex flex-col justify-center items-center">
+          <div className="w-full h-full overflow-y-auto scroll-snap-y-mandatory" style={{ scrollSnapType: 'y mandatory', height: '100%' }}
+            onScroll={e => {
+              const container = e.currentTarget;
+              const vh = container.offsetHeight;
+              const scrollY = container.scrollTop;
+              const idx = Math.round(scrollY / vh);
+              if (idx !== current && idx >= 0 && idx < products.length) setCurrent(idx);
+            }}
+          >
+            {products.map((_, idx) => (
+              <div key={idx} className="w-full h-full scroll-snap-align-start" style={{ scrollSnapAlign: 'start', height: '100%' }} />
+            ))}
+          </div>
+        </div>
       </div>
+    </div>
+  );
+}
+
+// Add this new component for the landing page
+function ProductsScrollSectionStudioLanding() {
+  const products = [
+    { name: 'Eidos', videoSrc: '/images/abstract4.mp4', description: 'Eidos is the world-leading generative AI for text, code, and more.', link: '/eidos' },
+    { name: 'Relay', videoSrc: '/images/abstract1.mp4', description: 'Relay brings next-gen video and image generation to creators.', link: '/relay' },
+    { name: 'Studio', videoSrc: '/images/abstract3.mp4', description: 'Studio is a powerful AI for video understanding and creative editing.', link: '/studio' },
+    { name: 'Draft', videoSrc: '/images/abstract2.mp4', description: 'Draft enables advanced audio and speech synthesis for your projects.', link: '/draft' },
+  ];
+  const [current, setCurrent] = React.useState(0);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const scrollTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const isScrollingRef = React.useRef(false);
+  const sectionRefs = React.useRef<HTMLDivElement[]>([]);
+  const nameRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
+  const [highlightStyle, setHighlightStyle] = React.useState<{top: number, height: number}>({top: 0, height: 0});
+
+  // Smooth scroll with momentum using React
+  const smoothScrollToIndex = React.useCallback((index: number) => {
+    if (!containerRef.current) return;
+    
+    const container = containerRef.current;
+    const targetY = index * container.offsetHeight;
+    
+    // Use requestAnimationFrame for smooth scrolling
+    const startY = container.scrollTop;
+    const distance = targetY - startY;
+    const duration = 800; // ms
+    const startTime = performance.now();
+    
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+    
+    const animateScroll = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutCubic(progress);
+      
+      container.scrollTop = startY + distance * easedProgress;
+      
+      if (progress < 1) {
+        requestAnimationFrame(animateScroll);
+      }
+    };
+    
+    requestAnimationFrame(animateScroll);
+  }, []);
+
+  // Handle wheel events for momentum scrolling
+  const handleWheel = React.useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    
+    if (isScrollingRef.current) return;
+    
+    // Clear existing timeout
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    
+    // Determine scroll direction and move to next/prev
+    const direction = e.deltaY > 0 ? 1 : -1;
+    const newIndex = Math.max(0, Math.min(products.length - 1, current + direction));
+    
+    if (newIndex !== current) {
+      isScrollingRef.current = true;
+      setCurrent(newIndex);
+      smoothScrollToIndex(newIndex);
+      
+      // Reset scrolling flag after animation
+      scrollTimeoutRef.current = setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 900);
+    }
+  }, [current, products.length, smoothScrollToIndex]);
+
+  React.useEffect(() => {
+    function updateHighlight() {
+      const el = nameRefs.current[current];
+      if (el) {
+        const parent = el.parentElement;
+        if (parent) {
+          const parentRect = parent.getBoundingClientRect();
+          const elRect = el.getBoundingClientRect();
+          setHighlightStyle({
+            top: elRect.top - parentRect.top,
+            height: elRect.height,
+          });
+        }
+      }
+    }
+    updateHighlight();
+    window.addEventListener('resize', updateHighlight);
+    return () => window.removeEventListener('resize', updateHighlight);
+  }, [current]);
+
+  // Cleanup timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <div 
+      ref={containerRef}
+      id="products-scroll-viewport-landing" 
+      className="w-full h-screen relative overflow-hidden"
+      onWheel={handleWheel}
+    >
+      {/* Explore Overlay */}
+      <div className="absolute left-8 top-8 z-30 flex flex-col items-start">
+        <ExploreMenu />
+      </div>
+      {products.map((product, idx) => (
+        <video
+          key={product.name}
+          src={product.videoSrc}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 z-0 ${current === idx ? 'opacity-100' : 'opacity-0'}`}
+          style={{ pointerEvents: 'none' }}
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+      ))}
+      <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
+      <div className="absolute left-10 top-1/2 -translate-y-1/2 z-20" style={{ pointerEvents: 'none' }}>
+      </div>
+      <div className="absolute right-10 top-1/2 -translate-y-1/2 flex flex-col items-end gap-2 z-20 pointer-events-none">
+        {products.map((p, i) => (
+          <a
+            key={p.name}
+            href={p.link}
+            className={`text-5xl md:text-7xl font-bold transition-all duration-300 text-right no-underline ${current === i ? 'text-yellow-200' : 'text-white/80'}`}
+            style={{ fontFamily: 'var(--font-sf-pro)', opacity: current === i ? 1 : 0.7, pointerEvents: 'auto', textDecoration: 'none' }}
+          >
+            {p.name}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Add this above the HomePage or ProductsScrollSectionStudioLanding function
+function ExploreMenu() {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <div className="relative">
+      <button
+        className="text-3xl font-bold text-white p-0 m-0"
+        style={{ background: 'none', boxShadow: 'none', border: 'none', minWidth: 0, textTransform: 'none', letterSpacing: 0 }}
+        onClick={() => setOpen((v) => !v)}
+      >
+        Out now
+      </button>
+      {open && (
+        <div className="absolute left-0 mt-2 w-48 rounded shadow-lg bg-gray-700 text-white z-50 border border-gray-500">
+          <div className="px-4 py-3">This is a grey menu bar.</div>
+        </div>
+      )}
     </div>
   );
 }

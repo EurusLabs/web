@@ -28,13 +28,11 @@ export function PublicationCard({ publication, viewMode }: PublicationCardProps)
           ${isGridView ? "flex flex-col h-full" : "flex flex-col md:flex-row items-start gap-4"}`}
     >
       {publication.image && (
-        <div className={`relative overflow-hidden w-full bg-black flex items-center justify-center`}>
-          <Image
+        <div className="aspect-square w-full relative overflow-hidden bg-black flex items-center justify-center">
+          <img
             src={publication.image || "https://eurusworkflows.blob.core.windows.net/eurusworkflows/placeholder.svg"}
             alt={`Preview image for ${publication.title}`}
-            width={isGridView ? 600 : 300} // Provide appropriate width for aspect ratio calculation
-            height={isGridView ? 400 : 200} // Provide appropriate height for aspect ratio calculation
-            className="object-contain w-full h-auto" // Maintain aspect ratio and fill width
+            className="object-cover w-full h-full rounded-lg"
           />
         </div>
       )}

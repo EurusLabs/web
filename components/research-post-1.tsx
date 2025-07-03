@@ -7,12 +7,10 @@ export default function ResearchPost1() {
         StochasticSplats — Stochastic Rasterization for Sorting-Free 3D Gaussian Splatting
       </h1>
       <div className="mb-8 w-full flex justify-center">
-        <Image
-          src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/stochastic-splats-new.jpeg" // Updated image path
+        <img
+          src="/images/1.jpg"
           alt="StochasticSplats comparison diagram"
-          width={1200}
-          height={800}
-          className="rounded-lg object-contain w-full h-auto"
+          className="aspect-square object-cover w-full h-auto rounded-lg"
         />
       </div>
       {/* Image under title */}

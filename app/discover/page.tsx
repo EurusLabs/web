@@ -40,7 +40,7 @@ export default function DiscoverPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-black text-white">
         <Navigation />
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center space-y-6">
@@ -87,7 +87,7 @@ export default function DiscoverPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-black text-white">
       {/* Animated Gradient Overlays */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-purple-600/10 to-pink-600/10 rounded-full blur-3xl animate-pulse" />
@@ -105,7 +105,7 @@ export default function DiscoverPage() {
 
       {/* Hero Section */}
       <div className="relative z-10 pt-32 pb-20 px-6">
-        <div className="max-w-7xl mx-auto text-center space-y-8 bg-background text-foreground dark:bg-neutral-900 dark:text-white">
+        <div className="max-w-7xl mx-auto text-center space-y-8 bg-black text-white">
           <div className="space-y-6">
             <div className="flex items-center justify-center space-x-4 mb-8">
               <h1 className="text-7xl md:text-9xl font-black bg-gradient-to-r from-foreground via-purple-200 to-pink-200 bg-clip-text text-transparent tracking-tight dark:from-neutral-100 dark:via-purple-400 dark:to-pink-400">

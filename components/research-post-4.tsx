@@ -8,12 +8,10 @@ export default function SparseCausalityGuidancePost() {
       </h1>
       {/* Image under title */}
       <div className="mb-8 w-full flex justify-center">
-        <Image
-          src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/sparse-causality-guidance-new.jpeg" // Updated image path
+        <img
+          src="/images/4.jpg"
           alt="Sparse Causality Guidance concept"
-          width={1000}
-          height={600}
-          className="rounded-lg object-contain w-full h-auto"
+          className="aspect-square object-cover w-full h-auto rounded-lg"
         />
       </div>
       <h2 className="text-3xl font-bold text-foreground mb-4">Abstract</h2>

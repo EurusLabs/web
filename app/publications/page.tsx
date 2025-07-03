@@ -37,19 +37,19 @@ export default function PublicationsPage() {
   }, [activeCategory]) // Removed sortOrder from dependency array
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-black text-white">
       <Navigation />
       <main className="pt-24 pb-16 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto">
         <h1 className="text-5xl font-bold text-white mb-8">Research</h1>
 
         {/* Category Tabs */}
         <div className="flex gap-8 mb-8 pb-4">
-          {["All", "Blog", "Research", "Announcements"].map((category) => (
+          {["All", "Research", "Blog", "Announcements"].map((category) => (
             <button
               key={category}
               onClick={() => setActiveCategory(category.toLowerCase())}
               className={`text-lg font-medium bg-transparent border-none outline-none focus:outline-none transition-colors duration-200
-                ${activeCategory === category.toLowerCase() ? "border-b-2 border-foreground text-foreground" : "text-muted-foreground hover:text-foreground"}
+                ${activeCategory === category.toLowerCase() ? "border-b-2 border-white text-white" : "text-gray-400 hover:text-white"}
                 px-0 pb-2`}
               style={{ fontFamily: 'var(--font-sf-pro)' }}
             >
@@ -68,31 +68,31 @@ export default function PublicationsPage() {
                   Filter
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-gray-900 text-white border-gray-700">
+              <DropdownMenuContent className="w-56 bg-black text-white border-gray-800">
                 <DropdownMenuLabel className="text-gray-300">Filter By Category</DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-gray-700" />
+                <DropdownMenuSeparator className="bg-gray-800" />
                 <DropdownMenuRadioGroup value={activeCategory} onValueChange={setActiveCategory}>
                   <DropdownMenuRadioItem
                     value="all"
-                    className="data-[state=checked]:bg-gray-800 data-[state=checked]:text-white hover:bg-gray-800"
+                    className="data-[state=checked]:bg-gray-900 data-[state=checked]:text-white hover:bg-gray-900"
                   >
                     All
                   </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem
                     value="research"
-                    className="data-[state=checked]:bg-gray-800 data-[state=checked]:text-white hover:bg-gray-800"
+                    className="data-[state=checked]:bg-gray-900 data-[state=checked]:text-white hover:bg-gray-900"
                   >
                     Research
                   </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem
-                    value="blogs"
-                    className="data-[state=checked]:bg-gray-800 data-[state=checked]:text-white hover:bg-gray-800"
+                    value="blog"
+                    className="data-[state=checked]:bg-gray-900 data-[state=checked]:text-white hover:bg-gray-900"
                   >
-                    Blogs
+                    Blog
                   </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem
                     value="announcements" // Changed from 'press' to 'announcements'
-                    className="data-[state=checked]:bg-gray-800 data-[state=checked]:text-white hover:bg-gray-800"
+                    className="data-[state=checked]:bg-gray-900 data-[state=checked]:text-white hover:bg-gray-900"
                   >
                     Announcements
                   </DropdownMenuRadioItem>

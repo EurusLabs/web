@@ -8,12 +8,10 @@ export default function LatentLoopOptimizationPost() {
       </h1>
       {/* Image under title */}
       <div className="mb-8 w-full flex justify-center">
-        <Image
-          src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/latent-loop-optimization-new.jpeg" // Updated image path
+        <img
+          src="/images/2.jpg"
           alt="Latent Loop Optimization concept"
-          width={1000}
-          height={600}
-          className="rounded-lg object-contain w-full h-auto"
+          className="aspect-square object-cover w-full h-auto rounded-lg"
         />
       </div>
       <p className="text-muted-foreground mb-6">

@@ -8,12 +8,10 @@ export default function ProgressivePromptDetailingPost() {
       </h1>
       {/* Image under title */}
       <div className="mb-8 w-full flex justify-center">
-        <Image
-          src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/progressive-prompt-detailing-new.jpeg" // Updated image path
+        <img
+          src="/images/3.jpg"
           alt="Progressive Prompt Detailing concept"
-          width={1000}
-          height={600}
-          className="rounded-lg object-contain w-full h-auto"
+          className="aspect-square object-cover w-full h-auto rounded-lg"
         />
       </div>
       <p className="text-muted-foreground mb-6">
