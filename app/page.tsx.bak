@@ -11,6 +11,7 @@ import Link from "next/link"
 import Footer from "@/components/footer"
 import { EurusStudiosSection } from "@/app/components/eurus-studios-section"
 import NoSsr from "./components/NoSsr"
+import { publicationsData } from "@/components/publications-data"
 
 export default function Home() {
   return (
@@ -376,6 +377,26 @@ function HomePage() {
           <ProductsScrollSection />
         </div>
       </div>
+
+      {/* Recently Out Section */}
+      <section className="bg-background text-foreground w-full py-20 flex flex-col items-center justify-center">
+        <div className="flex items-center justify-center mb-12 gap-3">
+          <h2 className="text-4xl font-bold text-center" style={{ fontFamily: 'var(--font-sf-pro)' }}>Recently Out</h2>
+          <Link href="/research" className="flex items-center group">
+            <span className="sr-only">Go to Research</span>
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto w-full">
+          {publicationsData.slice(0, 3).map((pub) => (
+            <div key={pub.id} className="flex flex-col items-center">
+              <img src={pub.image} alt={pub.title} className="w-full h-48 object-cover rounded-lg mb-4" />
+              <div className="text-lg font-semibold text-foreground mb-1 text-center" style={{ fontFamily: 'var(--font-sf-pro)' }}>{pub.title}</div>
+              <div className="text-sm text-muted-foreground text-center">{pub.type} {pub.date}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+      <Footer />
     </div>
   )
 }

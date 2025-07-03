@@ -25,7 +25,8 @@ export default function Navigation({ forceWhite = false }: NavigationProps) {
   const sidebarRef = useRef(null)
   const { theme, setTheme } = useTheme()
 
-  const navColor = forceWhite ? "text-white" : (theme === 'dark' ? 'text-white' : 'text-black');
+  // Set navigation color: black in light mode, white in dark mode
+  const navColor = theme === 'dark' ? 'text-white' : 'text-black';
 
   useEffect(() => {
     // Check if user is logged in
@@ -71,37 +72,42 @@ export default function Navigation({ forceWhite = false }: NavigationProps) {
     <>
       {/* Top left logo and menu icon */}
       {!menuOpen && (
-        <div className="fixed top-0 left-0 z-50 flex items-center bg-transparent px-4 py-3">
-          <Link href="/" className={clsx("text-2xl font-medium tracking-normal transition-colors mr-4", forceWhite ? 'text-white' : (theme === 'dark' ? 'text-white' : 'text-black'))} style={{ fontFamily: 'var(--font-sf-pro)' }}>
-            Eurus Labs
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-between w-full bg-transparent px-4 py-3">
+          <div className="flex items-center">
+            <Link href="/" className={clsx("text-2xl font-medium tracking-normal transition-colors mr-4", navColor)} style={{ fontFamily: 'var(--font-sf-pro)' }}>
+              Eurus Labs
+            </Link>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className={clsx("text-2xl focus:outline-none bg-transparent transition-colors", navColor)}
+              aria-label="Open menu"
+            >
+              <FiMenu />
+            </button>
+          </div>
+          <Link href="/get-started" className="ml-4 px-6 py-2 rounded-full bg-primary text-primary-foreground font-semibold text-base hover:bg-primary/80 transition hidden sm:inline-block">
+            Get Started
           </Link>
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className={clsx("text-2xl focus:outline-none bg-transparent transition-colors", forceWhite ? 'text-white' : (theme === 'dark' ? 'text-white' : 'text-black'))}
-            aria-label="Open menu"
-          >
-            <FiMenu />
-          </button>
         </div>
       )}
       {/* Sidebar overlay */}
       {menuOpen && (
         <nav
           ref={sidebarRef}
-          className={`fixed top-0 left-0 h-full w-72 flex flex-col py-8 px-6 z-50 bg-background/90 text-foreground`}
+          className={`fixed top-0 left-0 h-full w-72 flex flex-col py-8 px-6 z-50 bg-background/90 ${navColor}`}
         >
           {/* Logo and close icon row */}
           <div className="flex items-center mb-8">
             <Link
               href="/"
-              className={clsx("text-2xl font-medium tracking-normal transition-colors mr-auto", forceWhite ? 'text-white' : (theme === 'dark' ? 'text-white' : 'text-black'))}
+              className={clsx("text-2xl font-medium tracking-normal transition-colors mr-auto", navColor)}
               style={{ fontFamily: 'var(--font-sf-pro)' }}
             >
               Eurus Labs
             </Link>
             <button
               onClick={() => setMenuOpen(false)}
-              className={clsx("text-2xl ml-2 transition-colors", forceWhite ? 'text-white' : (theme === 'dark' ? 'text-white' : 'text-black'))}
+              className={clsx("text-2xl ml-2 transition-colors", navColor)}
               aria-label="Close menu"
             >
               <FiX />
@@ -158,7 +164,7 @@ function Dropdown({ label, children, textColor }: { label: string, children: Rea
         <div className="ml-6 flex flex-col space-y-2 mt-1">
           {children}
         </div>
-      )}
-    </div>
+        )}
+      </div>
   )
 }
