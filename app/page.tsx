@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
@@ -11,10 +11,12 @@ import Link from "next/link"
 import Footer from "@/components/footer"
 import { EurusStudiosSection } from "@/app/components/eurus-studios-section"
 import NoSsr from "./components/NoSsr"
+import { publicationsData } from "@/components/publications-data"
 
 export default function Home() {
   return (
     <NoSsr>
+      <Navigation forceWhite />
       <HomePage />
     </NoSsr>
   )
@@ -328,16 +330,16 @@ function HomePage() {
           <div className="absolute inset-0 bg-black/30 pointer-events-none z-20" />
 
           {/* Navigation */}
-          <Navigation />
+          <Navigation forceWhite />
 
           {/* Main Content */}
           <div className="relative z-30 flex flex-col items-center justify-center min-h-screen px-6 pointer-events-none">
             <div className="text-center">
               <h1
-                className="text-white mx-auto"
+                className="text-foreground mx-auto font-bold"
                 style={{
                   fontFamily: "var(--font-sf-pro)",
-                  fontWeight: 400,
+                  fontWeight: 700,
                   fontSize: "80px",
                   lineHeight: "100%",
                   letterSpacing: "0%",
@@ -351,17 +353,18 @@ function HomePage() {
           </div>
 
           {/* Client Testimonial Card */}
-          <div 
-            key={currentTestimonialIndex}
-            className={`absolute ${testimonials[currentTestimonialIndex].position} bg-black/60 backdrop-blur-sm rounded-2xl p-4 flex items-center space-x-4 max-w-sm z-40 animate-fade-in`}
-          >
+          <div className="fixed bottom-8 right-8 bg-card/80 backdrop-blur-sm rounded-2xl p-4 flex items-center space-x-4 max-w-sm z-40">
             <Avatar className="w-12 h-12">
               <AvatarImage src={testimonials[currentTestimonialIndex].image} alt={testimonials[currentTestimonialIndex].name} />
               <AvatarFallback>{testimonials[currentTestimonialIndex].name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <p className="text-white text-sm font-medium mb-2">"{testimonials[currentTestimonialIndex].quote}"</p>
-              <p className="text-white/70 text-xs font-medium">— {testimonials[currentTestimonialIndex].name}</p>
+              <p className="text-foreground text-sm font-medium mb-2" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+                "{testimonials[currentTestimonialIndex].quote}"
+              </p>
+              <p className="text-foreground/70 text-xs font-medium" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+                — {testimonials[currentTestimonialIndex].name}
+              </p>
             </div>
           </div>
         </div>
@@ -369,88 +372,78 @@ function HomePage() {
         {/* Second Page - Eurus Studios Section */}
         <EurusStudiosSection />
 
-        {/* Third Page - Creatives Section */}
-        <div className="min-h-screen relative bg-white text-black scroll-snap-section flex flex-col justify-center overflow-hidden">
-          <div className="relative z-10 w-full space-y-16 py-24">
-            {/* Top Title & Button */}
-            <div className="text-center px-6 md:px-12 lg:px-24">
-              <h2 className="text-5xl md:text-6xl font-bold">
-                How the world's top creatives
-                <br />
-                are using Eurus.
-              </h2>
-              <button className="mt-8 border border-black text-black font-semibold py-2 px-6 rounded-full hover:bg-black hover:text-white transition-colors">
-                More Customer Stories
-              </button>
-            </div>
-
-            {/* Middle: Tilted Scrolling Video Cards */}
-            <div className="w-[120vw] relative left-1/2 -translate-x-1/2 transform -rotate-4">
-              <div className="overflow-hidden photo-strip-container">
-                <div className="flex animate-scroll-left space-x-8">
-                  {/* First set of cards */}
-                  {podcasters.map((podcaster, index) => (
-                    <div
-                      key={`first-${index}`}
-                      className="flex-shrink-0 w-[380px] rounded-lg overflow-hidden cursor-pointer"
-                    >
-                      <div className="aspect-video relative mb-4">
-                        <video
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                          className="w-full h-full object-cover rounded-lg"
-                        >
-                          <source src={podcaster.video} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500 mb-1">{podcaster.name}</p>
-                        <h3 className="text-black text-xl font-medium">{podcaster.show}</h3>
-                      </div>
-                    </div>
-                  ))}
-                  {/* Duplicate set for seamless loop */}
-                  {podcasters.map((podcaster, index) => (
-                    <div
-                      key={`second-${index}`}
-                      className="flex-shrink-0 w-[380px] rounded-lg overflow-hidden cursor-pointer"
-                    >
-                      <div className="aspect-video relative mb-4">
-                        <video
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                          className="w-full h-full object-cover rounded-lg"
-                        >
-                          <source src={podcaster.video} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500 mb-1">{podcaster.name}</p>
-                        <h3 className="text-black text-xl font-medium">{podcaster.show}</h3>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom: "Join other..." text */}
-            <h2 className="text-center text-4xl md:text-5xl font-bold px-6 md:px-12 lg:px-24">
-              <span>Join other </span>
-              <span className="text-blue-500">{professions[currentProfessionIndex]}</span>
-            </h2>
-          </div>
+        {/* Third Page - Products Scroll Section */}
+        <div className="min-h-screen relative scroll-snap-section flex flex-col justify-center overflow-hidden">
+          <ProductsScrollSection />
         </div>
       </div>
 
-      {/* Footer - Outside scroll-snap container */}
+      {/* Recently Out Section */}
+      <section className="bg-background text-foreground w-full py-20 flex flex-col items-center justify-center">
+        <div className="flex items-center justify-center mb-12 gap-3">
+          <h2 className="text-4xl font-bold text-center" style={{ fontFamily: 'var(--font-sf-pro)' }}>Recently Out</h2>
+          <Link href="/research" className="flex items-center group">
+            <span className="sr-only">Go to Research</span>
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto w-full">
+          {publicationsData.slice(0, 3).map((pub) => (
+            <div key={pub.id} className="flex flex-col items-center">
+              <img src={pub.image} alt={pub.title} className="w-full h-48 object-cover rounded-lg mb-4" />
+              <div className="text-lg font-semibold text-foreground mb-1 text-center" style={{ fontFamily: 'var(--font-sf-pro)' }}>{pub.title}</div>
+              <div className="text-sm text-muted-foreground text-center">{pub.type} {pub.date}</div>
+            </div>
+          ))}
+        </div>
+      </section>
       <Footer />
     </div>
   )
+}
+
+function ProductsScrollSection() {
+  const products = [
+    { name: 'Studio', imgSrc: '/wave-glass.jpg', description: 'Studio is your all-in-one creative suite for audio and video production, designed for storytellers and creators.' },
+    { name: 'Write', imgSrc: '/glass-blobs.jpg', description: 'Write is a next-gen writing and publishing platform for creators, teams, and communities.' },
+    { name: 'Relay', imgSrc: '/color-flower-1.jpg', description: 'Relay lets you share, distribute, and monetize your stories and podcasts across platforms.' },
+    { name: 'Eidos', imgSrc: '/color-flower-2.jpg', description: "Eidos is where you discover, listen, and connect with the world's best creators and their content." },
+  ];
+  const [selected, setSelected] = React.useState(0);
+
+  return (
+    <div className="relative w-screen h-screen flex items-stretch overflow-hidden">
+      {/* Background Image */}
+      <img
+        src={products[selected].imgSrc}
+        alt={products[selected].name}
+        className="absolute inset-0 w-full h-full object-cover transition-all duration-500 z-0"
+        style={{ opacity: 1 }}
+      />
+      {/* Overlay for better text visibility */}
+      <div className="absolute inset-0 bg-black/40 z-10" />
+      {/* Vertical Product Names - left side */}
+      <div className="relative z-20 flex flex-col justify-center items-start h-full px-10 gap-4 md:gap-8 flex-1">
+        {products.map((product, idx) => (
+          <button
+            key={product.name}
+            onClick={() => setSelected(idx)}
+            className={`text-5xl md:text-7xl font-bold transition-all duration-200 focus:outline-none text-left ${selected === idx ? 'text-white' : 'text-white/60'}`}
+            style={{ fontFamily: 'var(--font-sf-pro)', opacity: selected === idx ? 1 : 0.6 }}
+          >
+            {product.name}
+          </button>
+        ))}
+      </div>
+      {/* Product Description - right side, just text, no box, with arrow */}
+      <div className="absolute right-10 top-1/2 transform -translate-y-1/2 z-20 max-w-lg text-right flex flex-col items-end">
+        <p className="text-2xl md:text-3xl font-semibold mb-2 text-white drop-shadow-lg" style={{ fontFamily: 'var(--font-sf-pro)' }}>{products[selected].name}</p>
+        <p className="text-lg md:text-xl text-white drop-shadow-lg mb-4" style={{ fontFamily: 'var(--font-sf-pro)' }}>{products[selected].description}</p>
+        <span className="flex justify-center w-full">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 10L12 16L18 10" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </span>
+      </div>
+    </div>
+  );
 }

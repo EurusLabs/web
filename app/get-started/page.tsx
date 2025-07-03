@@ -138,7 +138,7 @@ export default function GetStartedPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-background">
       {/* Left Side - Image with Text Overlay */}
       <div className="flex-1 relative overflow-hidden">
         {/* Background Images */}
@@ -158,11 +158,11 @@ export default function GetStartedPage() {
         ))}
         
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-background/40" />
         
         {/* Text Content */}
         <div className="absolute inset-0 flex items-center justify-center p-12">
-          <div className="text-center text-white max-w-lg">
+          <div className="text-center text-foreground max-w-lg">
             <h1 className="text-5xl font-light mb-6 leading-tight">
               Everything you need,<br />
               to make anything you<br />
@@ -178,19 +178,19 @@ export default function GetStartedPage() {
         
         {/* Logo */}
         <div className="absolute top-8 left-8">
-          <h2 className="text-white text-2xl font-light">eurus labs</h2>
+          <h2 className="text-foreground text-2xl font-light">Eurus Labs</h2>
         </div>
       </div>
 
       {/* Right Side - Get Started Form */}
-      <div className="flex-1 bg-white flex items-center justify-center p-12">
+      <div className="flex-1 bg-background flex items-center justify-center p-12">
         <div className="w-full max-w-sm">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+            <h1 className="text-3xl font-semibold text-foreground mb-2">
               Start creating on Eurus Labs
             </h1>
-            <p className="text-gray-600">
+            <p className="text-foreground/70">
               Join 250,000+ creators building fandoms, earning from memberships, and selling digital products.
             </p>
           </div>
@@ -202,7 +202,7 @@ export default function GetStartedPage() {
               placeholder="Username or Email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full h-12 px-4 border border-border rounded-lg focus:ring-2 focus:ring-foreground focus:border-transparent"
               required
             />
             <Input
@@ -210,13 +210,13 @@ export default function GetStartedPage() {
               placeholder="Password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full h-12 px-4 border border-border rounded-lg focus:ring-2 focus:ring-foreground focus:border-transparent"
               required
             />
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full h-12 bg-black text-white rounded-lg hover:bg-gray-800 font-medium"
+              className="w-full h-12 bg-primary text-primary-foreground rounded-lg hover:bg-primary/80 font-medium"
             >
               {isLoading ? "Getting started..." : "Get Started"}
             </Button>
@@ -224,7 +224,7 @@ export default function GetStartedPage() {
 
           {/* Divider */}
           <div className="text-center mb-6">
-            <span className="text-gray-400 text-sm">OR</span>
+            <span className="text-foreground/50 text-sm">OR</span>
           </div>
 
           {/* Social Login Buttons */}
@@ -234,11 +234,11 @@ export default function GetStartedPage() {
               onClick={() => handleSocialLogin("google")}
               disabled={isLoading}
               variant="outline"
-              className="w-full h-12 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium"
+              className="w-full h-12 border border-border rounded-lg hover:bg-background/10 font-medium"
             >
               <div className="flex items-center justify-center space-x-3">
                 {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-border border-t-foreground rounded-full animate-spin" />
                 ) : (
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -256,11 +256,11 @@ export default function GetStartedPage() {
               onClick={() => handleSocialLogin("apple")}
               disabled={isLoading}
               variant="outline"
-              className="w-full h-12 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium"
+              className="w-full h-12 border border-border rounded-lg hover:bg-background/10 font-medium"
             >
               <div className="flex items-center justify-center space-x-3">
                 {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-border border-t-foreground rounded-full animate-spin" />
                 ) : (
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
@@ -275,11 +275,11 @@ export default function GetStartedPage() {
               onClick={() => handleSocialLogin("facebook")}
               disabled={isLoading}
               variant="outline"
-              className="w-full h-12 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium"
+              className="w-full h-12 border border-border rounded-lg hover:bg-background/10 font-medium"
             >
               <div className="flex items-center justify-center space-x-3">
                 {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-border border-t-foreground rounded-full animate-spin" />
                 ) : (
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path
@@ -297,7 +297,7 @@ export default function GetStartedPage() {
               onClick={() => handleSocialLogin("sso")}
               disabled={isLoading}
               variant="outline"
-              className="w-full h-12 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium"
+              className="w-full h-12 border border-border rounded-lg hover:bg-background/10 font-medium"
             >
               <span>{isLoading ? "Signing in..." : "Use Single Sign-On (SSO)"}</span>
             </Button>
@@ -305,13 +305,13 @@ export default function GetStartedPage() {
 
           {/* Terms */}
           <div className="text-center mt-6">
-            <p className="text-gray-600 text-xs">
+            <p className="text-foreground/70 text-xs">
               By signing up, you are creating a Eurus Labs account and agree to Eurus Labs'{" "}
-              <Link href="/terms" className="text-blue-600 hover:text-blue-700 underline">
+              <Link href="/terms" className="text-primary hover:text-primary/80 underline">
                 Terms
               </Link>{" "}
               and{" "}
-              <Link href="/privacy" className="text-blue-600 hover:text-blue-700 underline">
+              <Link href="/privacy" className="text-primary hover:text-primary/80 underline">
                 Privacy Policy
               </Link>
             </p>

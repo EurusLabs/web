@@ -26,7 +26,7 @@ function ResultsContent() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden animate-slide-in-right">
+    <div className="min-h-screen relative overflow-hidden animate-slide-in-right bg-background">
       {/* Background Image - Updated to use new SVG */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -36,7 +36,7 @@ function ResultsContent() {
       />
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40" />
+      <div className="absolute inset-0 bg-background/40" />
 
       {/* Navigation */}
       <Navigation />

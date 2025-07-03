@@ -130,7 +130,7 @@ export default function ResearchPage() {
   if (!hydrated) return null // Prevent SSR mismatch
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       {/* Main Content */}
@@ -139,11 +139,11 @@ export default function ResearchPage() {
         <div className="mb-16">
           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-8 mb-8">
             <div className="max-w-3xl">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight">
-                Research
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 tracking-tight">
+                Publications
               </h1>
-              <p className="text-xl md:text-2xl text-gray-300 leading-relaxed font-light whitespace-nowrap">
-                We're advancing research in AI systems that can understand and simulate the world and its dynamics.
+              <p className="text-xl md:text-2xl text-foreground/80 leading-relaxed font-light whitespace-nowrap">
+                Explore our latest research, papers, and publications in AI and creative technology.
               </p>
             </div>
             

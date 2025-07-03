@@ -40,22 +40,22 @@ export default function DiscoverPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center space-y-6">
             <div className="relative">
-              <div className="w-20 h-20 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
+              <div className="w-20 h-20 border-4 border-foreground/30 border-t-foreground rounded-full animate-spin mx-auto" />
               <div
                 className="absolute inset-0 w-20 h-20 border-4 border-transparent border-r-purple-400 rounded-full animate-spin mx-auto"
                 style={{ animationDirection: "reverse", animationDuration: "1.5s" }}
               />
             </div>
             <div className="space-y-2">
-              <p className="text-3xl font-bold bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent">
+              <p className="text-3xl font-bold bg-gradient-to-r from-foreground via-purple-200 to-pink-200 bg-clip-text text-transparent">
                 Loading Creative Content
               </p>
-              <p className="text-white/80 text-lg">Discovering amazing creators...</p>
+              <p className="text-foreground/80 text-lg">Discovering amazing creators...</p>
             </div>
           </div>
         </div>
@@ -65,18 +65,18 @@ export default function DiscoverPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center space-y-6 p-8 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20">
+          <div className="text-center space-y-6 p-8 rounded-3xl bg-card/10 backdrop-blur-xl border border-border/20">
             <Zap className="w-16 h-16 text-red-400 mx-auto" />
             <div className="space-y-2">
-              <h3 className="text-2xl font-bold text-white">Connection Error</h3>
+              <h3 className="text-2xl font-bold text-foreground">Connection Error</h3>
               <p className="text-red-400 text-lg">Unable to load creative content: {error}</p>
             </div>
             <Button
               onClick={() => window.location.reload()}
-              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-none px-8 py-3 rounded-full font-semibold"
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-foreground border-none px-8 py-3 rounded-full font-semibold"
             >
               Retry Connection
             </Button>
@@ -87,7 +87,7 @@ export default function DiscoverPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-background">
       {/* Animated Gradient Overlays */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-purple-600/10 to-pink-600/10 rounded-full blur-3xl animate-pulse" />
@@ -105,33 +105,33 @@ export default function DiscoverPage() {
 
       {/* Hero Section */}
       <div className="relative z-10 pt-32 pb-20 px-6">
-        <div className="max-w-7xl mx-auto text-center space-y-8">
+        <div className="max-w-7xl mx-auto text-center space-y-8 bg-background text-foreground dark:bg-neutral-900 dark:text-white">
           <div className="space-y-6">
             <div className="flex items-center justify-center space-x-4 mb-8">
-              <h1 className="text-7xl md:text-9xl font-black bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent tracking-tight">
+              <h1 className="text-7xl md:text-9xl font-black bg-gradient-to-r from-foreground via-purple-200 to-pink-200 bg-clip-text text-transparent tracking-tight dark:from-neutral-100 dark:via-purple-400 dark:to-pink-400">
                 DISCOVER
               </h1>
             </div>
-            <div className="h-1 w-40 bg-gradient-to-r from-transparent via-white to-transparent mx-auto rounded-full" />
+            <div className="h-1 w-40 bg-gradient-to-r from-transparent via-foreground to-transparent mx-auto rounded-full dark:via-neutral-200" />
           </div>
-          <p className="text-2xl text-white/90 max-w-4xl mx-auto leading-relaxed font-light">
-            Explore the creative universe of <span className="text-purple-300 font-semibold">talented creators</span>{" "}
+          <p className="text-2xl text-foreground/90 max-w-4xl mx-auto leading-relaxed font-light dark:text-neutral-200">
+            Explore the creative universe of <span className="text-purple-300 font-semibold dark:text-purple-400">talented creators</span>{' '}
             sharing their passion through premium audio content
           </p>
           <div className="flex justify-center mt-12">
             <Button
               asChild
-              className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-none px-12 py-6 rounded-full font-bold text-xl transition-all duration-300 hover:scale-105 shadow-2xl shadow-purple-500/30"
+              className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-none px-12 py-6 rounded-full font-bold text-xl transition-all duration-300 hover:scale-105 shadow-2xl shadow-purple-500/30 dark:from-neutral-800 dark:to-pink-700"
             >
               <Link href="/create-album">
                 <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+                  <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300 dark:bg-neutral-200/20">
                     <Plus className="w-4 h-4" />
                   </div>
                   <span>Create your own album</span>
                 </div>
                 {/* Animated background effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
+                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out dark:via-neutral-200/20" />
               </Link>
             </Button>
           </div>

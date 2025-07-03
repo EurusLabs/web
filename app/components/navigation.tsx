@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,10 +9,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
+import { FiMenu, FiX, FiChevronDown, FiMoon } from "react-icons/fi"
+import { useTheme } from 'next-themes'
+import { FaMoon } from "react-icons/fa"
+import clsx from 'clsx'
 
-export default function Navigation() {
+interface NavigationProps {
+  forceWhite?: boolean;
+}
+
+export default function Navigation({ forceWhite = false }: NavigationProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [user, setUser] = useState<any>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const sidebarRef = useRef(null)
+  const { theme, setTheme } = useTheme()
+
+  const navColor = forceWhite ? "text-white" : (theme === 'dark' ? 'text-white' : 'text-black');
 
   useEffect(() => {
     // Check if user is logged in
@@ -24,6 +37,21 @@ export default function Navigation() {
       setUser(JSON.parse(userData))
     }
   }, [])
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (sidebarRef.current && !(sidebarRef.current as any).contains(event.target)) {
+        setMenuOpen(false)
+      }
+    }
+    if (menuOpen) {
+      document.addEventListener("mousedown", handleClickOutside)
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [menuOpen])
 
   const handleLogout = () => {
     // Clear all stored data
@@ -40,117 +68,97 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-black/20 backdrop-blur-sm">
-      {/* Left - Eurus Labs Logo */}
-      <div className="flex-shrink-0">
-        <Link href="/" className="text-white text-2xl font-medium tracking-normal hover:text-gray-300 transition-colors" style={{ fontFamily: 'Dancing Script, cursive' }}>
-          eurus labs<span className="text-red-500 ml-1">.</span>
-        </Link>
-      </div>
-
-      {/* Center - Navigation Items */}
-      <div className="flex items-center justify-center space-x-8 flex-1">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="text-white hover:text-gray-300 transition-colors p-0 h-auto font-normal">
-              Products
-              <ChevronDown className="ml-1 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48 bg-black/90 backdrop-blur-sm border-white/20">
-            <DropdownMenuItem asChild>
-              <Link href="/eurus-studio" className="text-white hover:text-gray-300 cursor-pointer">
-                Eurus Studio
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <a 
-                href="http://localhost:3001" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-white hover:text-gray-300 cursor-pointer"
-              >
-                Eurus Draft
-              </a>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <a 
-                href="https://www.relayedstories.com/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-white hover:text-gray-300 cursor-pointer"
-              >
-                Relay
-              </a>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/discover" className="text-white hover:text-gray-300 cursor-pointer">
-                Eidos
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Link href="/research" className="text-white hover:text-gray-300 transition-colors">
-          Research
-        </Link>
-        <Link href="/manifesto" className="text-white hover:text-gray-300 transition-colors">
-          Manifesto
-        </Link>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="text-white hover:text-gray-300 transition-colors p-0 h-auto font-normal">
-              Learn
-              <ChevronDown className="ml-1 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48 bg-black/90 backdrop-blur-sm border-white/20">
-            <DropdownMenuItem asChild>
-              <Link href="/academy" className="text-white hover:text-gray-300 cursor-pointer">
-                Academy
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <a 
-                href="https://eurus-labs.gitbook.io/eurus-labs/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-white hover:text-gray-300 cursor-pointer"
-              >
-                Documentation
-              </a>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/community" className="text-white hover:text-gray-300 cursor-pointer">
-                Community
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {/* Right - Auth Buttons */}
-      <div className="flex items-center space-x-4 flex-shrink-0">
-        {isLoggedIn ? (
-          <>
-            {user && <span className="text-white/80 text-sm font-medium">Welcome, {user.name || user.username}</span>}
-            <Button
-              onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white border-none rounded-full px-6 py-2 font-medium transition-all duration-300 hover:scale-105"
-              style={{
-                fontFamily: "var(--font-sf-pro)",
-                fontWeight: 500,
-                fontSize: "14px",
-              }}
+    <>
+      {/* Top left logo and menu icon */}
+      {!menuOpen && (
+        <div className="fixed top-0 left-0 z-50 flex items-center bg-transparent px-4 py-3">
+          <Link href="/" className={clsx("text-2xl font-medium tracking-normal transition-colors mr-4", forceWhite ? 'text-white' : (theme === 'dark' ? 'text-white' : 'text-black'))} style={{ fontFamily: 'var(--font-sf-pro)' }}>
+            Eurus Labs
+          </Link>
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className={clsx("text-2xl focus:outline-none bg-transparent transition-colors", forceWhite ? 'text-white' : (theme === 'dark' ? 'text-white' : 'text-black'))}
+            aria-label="Open menu"
+          >
+            <FiMenu />
+          </button>
+        </div>
+      )}
+      {/* Sidebar overlay */}
+      {menuOpen && (
+        <nav
+          ref={sidebarRef}
+          className={`fixed top-0 left-0 h-full w-72 flex flex-col py-8 px-6 z-50 bg-background/90 text-foreground`}
+        >
+          {/* Logo and close icon row */}
+          <div className="flex items-center mb-8">
+            <Link
+              href="/"
+              className={clsx("text-2xl font-medium tracking-normal transition-colors mr-auto", forceWhite ? 'text-white' : (theme === 'dark' ? 'text-white' : 'text-black'))}
+              style={{ fontFamily: 'var(--font-sf-pro)' }}
             >
-              Logout
-            </Button>
-          </>
-        ) : (
-          <Button asChild className="bg-white/90 text-black hover:bg-white transition-colors rounded-full px-6">
-            <Link href="/get-started">Get Started</Link>
-          </Button>
-        )}
-      </div>
-    </nav>
+              Eurus Labs
+            </Link>
+            <button
+              onClick={() => setMenuOpen(false)}
+              className={clsx("text-2xl ml-2 transition-colors", forceWhite ? 'text-white' : (theme === 'dark' ? 'text-white' : 'text-black'))}
+              aria-label="Close menu"
+            >
+              <FiX />
+            </button>
+          </div>
+          {/* Menu Items */}
+          <Dropdown label="Product" textColor="inherit">
+            <a href="https://eidos.press/" target="_blank" rel="noopener noreferrer" className="hover:text-foreground/70 transition-colors">Eidos</a>
+            <Link href="/eurus-studio" className="hover:text-foreground/70 transition-colors">Studio</Link>
+            <a href="http://localhost:3001" target="_blank" rel="noopener noreferrer" className="hover:text-foreground/70 transition-colors">Write</a>
+            <a href="https://www.relayedstories.com/" target="_blank" rel="noopener noreferrer" className="hover:text-foreground/70 transition-colors">Relay</a>
+          </Dropdown>
+          <Dropdown label="Publications" textColor="inherit">
+            <Link href="/publications" className="hover:text-foreground/70 transition-colors">Research</Link>
+            <Link href="/announcements" className="hover:text-foreground/70 transition-colors">Announcements</Link>
+            <Link href="/blog" className="hover:text-foreground/70 transition-colors">Blog</Link>
+          </Dropdown>
+          <Link href="/manifesto" className="text-base font-medium py-2 px-4 rounded hover:bg-background/20">Manifesto</Link>
+          <Link href="/community" className="text-base font-medium py-2 px-4 rounded hover:bg-background/20">Community</Link>
+          {/* Light/Dark mode toggle at the bottom right */}
+          <div className="mt-auto flex items-end justify-end w-full">
+            <button
+              className={clsx(
+                "text-xl p-2 rounded-full transition-colors",
+                theme === 'dark' ? 'text-foreground hover:bg-foreground/10' : 'text-neutral-700 hover:bg-neutral-200'
+              )}
+              aria-label="Toggle dark mode"
+              style={{ position: 'absolute', bottom: 24, right: 24 }}
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            >
+              {theme === 'dark' ? <FaMoon /> : <FiMoon />}
+            </button>
+          </div>
+        </nav>
+      )}
+    </>
+  )
+}
+
+// Sleek dropdown component
+function Dropdown({ label, children, textColor }: { label: string, children: React.ReactNode, textColor: string }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="mb-2">
+      <button
+        onClick={() => setOpen(!open)}
+        className={`flex items-center w-full text-base font-medium py-2 px-4 rounded hover:bg-gray-800 focus:outline-none ${textColor}`}
+        style={{ fontFamily: 'var(--font-sf-pro)' }}
+      >
+        {label}
+        <FiChevronDown className={`ml-2 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="ml-6 flex flex-col space-y-2 mt-1">
+          {children}
+        </div>
+      )}
+    </div>
   )
 }
