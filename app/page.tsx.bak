@@ -54,46 +54,46 @@ function HomePage() {
     {
       quote: "Eurus Labs transformed our content creation process. The AI tools are incredible!",
       name: "Sarah Chen",
-      image: "/placeholder-user.jpg",
+      image: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/placeholder-user.jpg",
       position: "bottom-8 right-8"
     },
     {
       quote: "The creative possibilities are endless with Eurus. It's like having a whole team.",
       name: "Marcus Rodriguez",
-      image: "/person.jpg",
+      image: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/person.jpg",
       position: "top-24 left-8"
     },
     {
       quote: "Finally, a platform that understands what creators actually need. Game changer!",
       name: "Emily Johnson",
-      image: "/placeholder-user.jpg",
+      image: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/placeholder-user.jpg",
       position: "bottom-8 left-8"
     },
     {
       quote: "Our productivity has increased 300% since we started using Eurus products.",
       name: "Alex Thompson",
-      image: "/person.jpg",
+      image: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/person.jpg",
       position: "top-24 right-8"
     },
     {
       quote: "Working with Eurus has revolutionized how we approach storytelling and content.",
       name: "Maya Patel",
-      image: "/placeholder-user.jpg",
+      image: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/placeholder-user.jpg",
       position: "bottom-1/3 right-1/3"
     }
   ]
 
-  const homeVideos = ["/videos/home1.mp4", "/videos/home2.mp4", "/videos/home3.mp4", "/videos/home4.mp4"]
+  const homeVideos = ["https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/home1.mp4", "https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/home2.mp4", "https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/home3.mp4", "https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/home4.mp4"]
 
   const podcasters = [
-    { name: "Alex Thompson", show: "The Daily Insight", video: "/videos/1.mp4" },
-    { name: "Sophia Chen", show: "Literary Legends", video: "/videos/2.mp4" },
-    { name: "Emma Rodriguez", show: "Urban Perspectives", video: "/videos/3.mp4" },
-    { name: "Marcus Johnson", show: "Tech Unpacked", video: "/videos/4.mp4" },
-    { name: "Sarah Williams", show: "Creative Minds", video: "/videos/5.mp4" },
-    { name: "David Park", show: "Future Forward", video: "/videos/6.mp4" },
-    { name: "Lisa Anderson", show: "Health & Wellness", video: "/videos/7.mp4" },
-    { name: "Ryan Mitchell", show: "Business Insights", video: "/videos/8.mp4" },
+    { name: "Alex Thompson", show: "The Daily Insight", video: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/1.mp4" },
+    { name: "Sophia Chen", show: "Literary Legends", video: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/2.mp4" },
+    { name: "Emma Rodriguez", show: "Urban Perspectives", video: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/3.mp4" },
+    { name: "Marcus Johnson", show: "Tech Unpacked", video: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/4.mp4" },
+    { name: "Sarah Williams", show: "Creative Minds", video: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/5.mp4" },
+    { name: "David Park", show: "Future Forward", video: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/6.mp4" },
+    { name: "Lisa Anderson", show: "Health & Wellness", video: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/7.mp4" },
+    { name: "Ryan Mitchell", show: "Business Insights", video: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/8.mp4" },
   ]
 
   // Get next video index
@@ -403,10 +403,10 @@ function HomePage() {
 
 function ProductsScrollSection() {
   const products = [
-    { name: 'Studio', imgSrc: '/wave-glass.jpg', description: 'Studio is your all-in-one creative suite for audio and video production, designed for storytellers and creators.' },
-    { name: 'Write', imgSrc: '/glass-blobs.jpg', description: 'Write is a next-gen writing and publishing platform for creators, teams, and communities.' },
-    { name: 'Relay', imgSrc: '/color-flower-1.jpg', description: 'Relay lets you share, distribute, and monetize your stories and podcasts across platforms.' },
-    { name: 'Eidos', imgSrc: '/color-flower-2.jpg', description: "Eidos is where you discover, listen, and connect with the world's best creators and their content." },
+    { name: 'Studio', imgSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/wave-glass.jpg', description: 'Studio is your all-in-one creative suite for audio and video production, designed for storytellers and creators.' },
+    { name: 'Write', imgSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/glass-blobs.jpg', description: 'Write is a next-gen writing and publishing platform for creators, teams, and communities.' },
+    { name: 'Relay', imgSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/color-flower-1.jpg', description: 'Relay lets you share, distribute, and monetize your stories and podcasts across platforms.' },
+    { name: 'Eidos', imgSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/color-flower-2.jpg', description: "Eidos is where you discover, listen, and connect with the world's best creators and their content." },
   ];
   const [selected, setSelected] = React.useState(0);
 

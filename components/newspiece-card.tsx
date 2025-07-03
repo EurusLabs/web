@@ -80,7 +80,7 @@ export function NewspieceCard({ newspiece, index }: NewspieceCardProps) {
 
             {/* Actual image */}
             <img
-              src={newspiece.image || "/placeholder.svg"}
+              src={newspiece.image || "https://eurusworkflows.blob.core.windows.net/eurusworkflows/placeholder.svg"}
               alt={newspiece.title}
               className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-110 ${
                 imageLoaded ? "opacity-100" : "opacity-0"

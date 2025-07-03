@@ -1,12 +1,12 @@
 import { ResearchPostContent } from "@/components/research-post-content"
 import Navigation from "../../components/navigation"
-import { useRouter } from "next/navigation"
+// import { useRouter } from "next/navigation"
 import { publicationsData } from "@/components/publications-data"
 import BackButton from "./BackButton"
 
 export default function ResearchPostPage({ params }: { params: { id: string } }) {
   const { id } = params
-  const router = useRouter()
+  // const router = useRouter()
 
   return (
     <div className="min-h-screen bg-background text-foreground">

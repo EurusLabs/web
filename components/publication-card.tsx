@@ -30,7 +30,7 @@ export function PublicationCard({ publication, viewMode }: PublicationCardProps)
       {publication.image && (
         <div className={`relative overflow-hidden w-full bg-black flex items-center justify-center`}>
           <Image
-            src={publication.image || "/placeholder.svg"}
+            src={publication.image || "https://eurusworkflows.blob.core.windows.net/eurusworkflows/placeholder.svg"}
             alt={`Preview image for ${publication.title}`}
             width={isGridView ? 600 : 300} // Provide appropriate width for aspect ratio calculation
             height={isGridView ? 400 : 200} // Provide appropriate height for aspect ratio calculation

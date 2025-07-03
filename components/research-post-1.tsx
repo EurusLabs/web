@@ -8,7 +8,7 @@ export default function ResearchPost1() {
       </h1>
       <div className="mb-8 w-full flex justify-center">
         <Image
-          src="/images/stochastic-splats-new.jpeg" // Updated image path
+          src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/stochastic-splats-new.jpeg" // Updated image path
           alt="StochasticSplats comparison diagram"
           width={1200}
           height={800}
@@ -18,7 +18,7 @@ export default function ResearchPost1() {
       {/* Image under title */}
       <div className="mb-8 w-full flex justify-center">
         <Image
-          src="/images/stochsplats-perf-quality.png"
+          src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/stochsplats-perf-quality.png"
           alt="StochSplats Performance vs Quality"
           width={1000}
           height={600}

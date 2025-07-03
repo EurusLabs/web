@@ -1,0 +1,119 @@
+name: Sync Assets to Azure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'public/**'
+
+env:
+  AZURE_STORAGE_ACCOUNT: eurusworkflows
+  AZURE_CONTAINER_NAME: eurusworkflows
+
+jobs:
+  sync-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Upload Assets to Azure
+        run: |
+          # Install Azure CLI
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+          # Create mappings file
+          > url-mappings.txt
+
+          # Upload files and generate mappings
+          find public -type f \( ! -name "*.html" \) | while read -r file; do
+            relative_path=${file#public/}
+            echo "Uploading $file..."
+            
+            # Upload file
+            az storage blob upload \
+              --account-name $AZURE_STORAGE_ACCOUNT \
+              --container-name $AZURE_CONTAINER_NAME \
+              --name "$relative_path" \
+              --file "$file" \
+              --auth-mode login \
+              --overwrite true
+
+            # Get the URL
+            url=$(az storage blob url \
+              --account-name $AZURE_STORAGE_ACCOUNT \
+              --container-name $AZURE_CONTAINER_NAME \
+              --name "$relative_path" \
+              --auth-mode login \
+              --output tsv)
+
+            # Store the mapping
+            echo "/$relative_path|$url" >> url-mappings.txt
+            echo "Uploaded $file to $url"
+          done
+
+      - name: Update Asset References
+        run: |
+          # Update references in code
+          while IFS='|' read -r old_path new_url; do
+            # Remove any trailing whitespace
+            old_path=$(echo "$old_path" | tr -d '[:space:]')
+            new_url=$(echo "$new_url" | tr -d '[:space:]')
+            
+            echo "Replacing $old_path with $new_url"
+            
+            # Use grep to find files containing the old path
+            grep -r --files-with-matches "$old_path" app/ components/ --exclude-dir={node_modules,.next} | while read -r file; do
+              # Replace the old path with the new URL
+              sed -i "s|$old_path|$new_url|g" "$file"
+              echo "Updated $file"
+            done
+          done < url-mappings.txt
+
+      - name: Verify Upload
+        id: verify
+        run: |
+          # Verify all files were uploaded
+          all_uploaded=true
+          while IFS='|' read -r old_path new_url; do
+            status_code=$(curl -s -o /dev/null -w "%{http_code}" "$new_url")
+            if [ "$status_code" != "200" ]; then
+              echo "Failed to verify $new_url (Status: $status_code)"
+              all_uploaded=false
+            fi
+          done < url-mappings.txt
+
+          if [ "$all_uploaded" = true ]; then
+            echo "All files verified successfully"
+            echo "verified=true" >> $GITHUB_OUTPUT
+          else
+            echo "Some files failed verification"
+            echo "verified=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: Clean Up Public Directory
+        if: steps.verify.outputs.verified == 'true'
+        run: |
+          # Only remove files that were uploaded (keep .gitkeep)
+          while IFS='|' read -r old_path new_url; do
+            file_to_remove="public${old_path}"
+            if [ -f "$file_to_remove" ]; then
+              rm "$file_to_remove"
+              echo "Removed $file_to_remove"
+            fi
+          done < url-mappings.txt
+
+      - name: Commit Changes
+        if: steps.verify.outputs.verified == 'true'
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions@github.com'
+          git add -A
+          git commit -m "chore: sync assets to Azure and update references" || echo "No changes to commit"
+          git push

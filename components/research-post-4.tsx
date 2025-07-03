@@ -9,7 +9,7 @@ export default function SparseCausalityGuidancePost() {
       {/* Image under title */}
       <div className="mb-8 w-full flex justify-center">
         <Image
-          src="/images/sparse-causality-guidance-new.jpeg" // Updated image path
+          src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/sparse-causality-guidance-new.jpeg" // Updated image path
           alt="Sparse Causality Guidance concept"
           width={1000}
           height={600}
@@ -111,7 +111,7 @@ export default function SparseCausalityGuidancePost() {
           For each agent aᵢ at step t, the input context Cᵢ,ₜ is augmented:
           <div className="overflow-x-auto mb-4 flex justify-center">
             <img
-              src="/images/causal-hint-equation.png"
+              src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/causal-hint-equation.png"
               alt="Mathematical equation for augmented input context: C_i,t = BaseContext_i,t + Sum[(u,v) in E_t] lambda_u,v * CausalHint(u,v)"
               className="max-w-full h-auto"
             />

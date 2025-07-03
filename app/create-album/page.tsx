@@ -1170,7 +1170,7 @@ export default function CreateAlbumPage() {
                     <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
                       {albumData.coverImage ? (
                         <img
-                          src={albumData.coverImage || "/placeholder.svg"}
+                          src={albumData.coverImage || "https://eurusworkflows.blob.core.windows.net/eurusworkflows/placeholder.svg"}
                           alt={albumData.title}
                           className="w-full h-full object-cover"
                         />

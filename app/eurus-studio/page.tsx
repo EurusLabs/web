@@ -126,11 +126,11 @@ export default function EurusStudioPage() {
 
 function ProductsScrollSectionStudio() {
   const products = [
-    { name: 'GPT', imgSrc: '/wave-glass.jpg', description: 'GPT is the world-leading generative AI for text, code, and more.' },
-    { name: 'Runway Gen-4', imgSrc: '/glass-blobs.jpg', description: 'Runway Gen-4 brings next-gen video and image generation to creators.' },
-    { name: 'Veo 3', imgSrc: '/color-flower-1.jpg', description: 'Veo 3 is a powerful AI for video understanding and creative editing.' },
-    { name: 'Kling', imgSrc: '/color-flower-2.jpg', description: 'Kling enables advanced audio and speech synthesis for your projects.' },
-    { name: 'Luma ray 2', imgSrc: '/blur-blue.jpg', description: 'Luma ray 2 delivers photorealistic 3D and lighting effects with AI.' },
+    { name: 'GPT', imgSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/wave-glass.jpg', description: 'GPT is the world-leading generative AI for text, code, and more.' },
+    { name: 'Runway Gen-4', imgSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/glass-blobs.jpg', description: 'Runway Gen-4 brings next-gen video and image generation to creators.' },
+    { name: 'Veo 3', imgSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/color-flower-1.jpg', description: 'Veo 3 is a powerful AI for video understanding and creative editing.' },
+    { name: 'Kling', imgSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/color-flower-2.jpg', description: 'Kling enables advanced audio and speech synthesis for your projects.' },
+    { name: 'Luma ray 2', imgSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/blur-blue.jpg', description: 'Luma ray 2 delivers photorealistic 3D and lighting effects with AI.' },
   ];
   const [current, setCurrent] = React.useState(0);
   const sectionRefs = React.useRef<HTMLDivElement[]>([]);
@@ -281,7 +281,7 @@ function DraggableNodesLayer() {
   // Node definitions
   const initialNodes = [
     { id: 1, x: 120, y: 220, w: 110, h: 110, type: 'image', label: '3D' }, // small square
-    { id: 2, x: 120, y: 370, w: 260, h: 90, type: 'color', label: 'Color Reference' }, // wide rectangle
+    { id: 2, x: 120, y: 370, w: 260, h: 90, type: 'lut', label: 'LUT' }, // wide rectangle, now LUT
     { id: 3, x: 420, y: 220, w: 220, h: 300, type: 'image', label: 'Image' }, // large portrait
     { id: 4, x: 700, y: 220, w: 220, h: 300, type: 'video', label: 'Video' }, // large portrait
     { id: 5, x: 340, y: 320, w: 200, h: 60, type: 'text', label: 'Text' }, // moved further down
@@ -289,6 +289,8 @@ function DraggableNodesLayer() {
   const [nodes, setNodes] = React.useState(initialNodes);
   const [draggingId, setDraggingId] = React.useState<number | null>(null);
   const dragging = React.useRef<{ id: number | null; offsetX: number; offsetY: number }>({ id: null, offsetX: 0, offsetY: 0 });
+  const liveNodes = React.useRef(nodes);
+  React.useEffect(() => { liveNodes.current = nodes; }, [nodes]);
 
   // Connections: array of [fromId, toId]
   const connections = [
@@ -301,29 +303,40 @@ function DraggableNodesLayer() {
   // Y position constraint: nodes cannot be moved above this Y (below the heading)
   const minY = 180; // px, adjust as needed for your heading height
 
+  // Store drag state in refs for smoothness
+  const dragNodeRef = React.useRef<number | null>(null);
+  const dragOffsetRef = React.useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const animationFrame = React.useRef<number | null>(null);
+
   function onMouseDown(e: React.MouseEvent<HTMLDivElement>, id: number) {
-    const node = nodes.find(n => n.id === id);
+    const node = liveNodes.current.find(n => n.id === id);
     if (!node) return;
-    dragging.current = {
-      id,
-      offsetX: e.clientX - node.x,
-      offsetY: e.clientY - node.y,
-    };
+    dragNodeRef.current = id;
+    dragOffsetRef.current = { x: e.clientX - node.x, y: e.clientY - node.y };
     setDraggingId(id);
     window.addEventListener('mousemove', onMouseMove as any);
     window.addEventListener('mouseup', onMouseUp as any);
   }
+
   function onMouseMove(e: MouseEvent) {
-    const { id, offsetX, offsetY } = dragging.current;
-    setNodes(nodes => nodes.map(n => {
-      if (n.id !== id) return n;
-      let newY = e.clientY - offsetY;
-      if (newY < minY) newY = minY;
-      return { ...n, x: e.clientX - offsetX, y: newY };
-    }));
+    if (dragNodeRef.current == null) return;
+    const id = dragNodeRef.current;
+    const offset = dragOffsetRef.current;
+    let newY = e.clientY - offset.y;
+    if (newY < minY) newY = minY;
+    // Update node position in ref for smoothness
+    liveNodes.current = liveNodes.current.map(n => n.id === id ? { ...n, x: e.clientX - offset.x, y: newY } : n);
+    // Use requestAnimationFrame to update state at most once per frame
+    if (!animationFrame.current) {
+      animationFrame.current = requestAnimationFrame(() => {
+        setNodes(liveNodes.current);
+        animationFrame.current = null;
+      });
+    }
   }
+
   function onMouseUp() {
-    dragging.current = { id: null, offsetX: 0, offsetY: 0 };
+    dragNodeRef.current = null;
     setDraggingId(null);
     window.removeEventListener('mousemove', onMouseMove as any);
     window.removeEventListener('mouseup', onMouseUp as any);
@@ -386,13 +399,13 @@ function DraggableNodesLayer() {
             style={{ pointerEvents: 'auto', transition: 'none' }}
           >
             {node.type === 'image' && (
-              <img src="/placeholder.jpg" alt="img" className="w-full h-full object-cover rounded-xl" />
+              <img src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/placeholder.jpg" alt="img" className="w-full h-full object-cover rounded-xl" />
             )}
-            {node.type === 'color' && (
-              <img src="/public/images/color-flower-1.jpg" alt="color" className="w-full h-full object-cover rounded-xl" />
+            {node.type === 'lut' && (
+              <img src="/lut-gradient.png" alt="lut" className="w-full h-full object-cover rounded-xl" />
             )}
             {node.type === 'video' && (
-              <video src="/public/videos/1.mp4" className="w-full h-full object-cover rounded-lg" autoPlay loop muted playsInline />
+              <video src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/1.mp4" className="w-full h-full object-cover rounded-lg" autoPlay loop muted playsInline />
             )}
             {node.type === 'text' && (
               <span className="text-gray-700 dark:text-gray-200 text-sm px-2">Hello, world!</span>
@@ -401,7 +414,7 @@ function DraggableNodesLayer() {
           {/* Subtitle/description below node */}
           <span className="mt-1 text-[11px] text-gray-300 dark:text-gray-400 select-none">
             {node.type === 'image' && 'Image node'}
-            {node.type === 'color' && 'Color reference node'}
+            {node.type === 'lut' && 'LUT node'}
             {node.type === 'video' && 'Video node'}
             {node.type === 'text' && 'Text node'}
           </span>
