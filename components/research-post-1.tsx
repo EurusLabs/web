@@ -16,7 +16,7 @@ export default function ResearchPost1() {
       {/* Image under title */}
       <div className="mb-8 w-full flex justify-center">
         <Image
-          src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/stochsplats-perf-quality.png"
+          src="/images/stochsplats-perf-quality.png"
           alt="StochSplats Performance vs Quality"
           width={1000}
           height={600}

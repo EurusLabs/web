@@ -16,11 +16,11 @@ export default function GetStartedPage() {
 
   // Images for rotating background
   const backgroundImages = [
-    "https://eurusworkflows.blob.core.windows.net/eurusworkflows/bg_discover.png",
-    "https://eurusworkflows.blob.core.windows.net/eurusworkflows/chair_bg.svg", 
-    "https://eurusworkflows.blob.core.windows.net/eurusworkflows/homeBg.svg",
-    "https://eurusworkflows.blob.core.windows.net/eurusworkflows/person.jpg",
-    "https://eurusworkflows.blob.core.windows.net/eurusworkflows/podCast.svg"
+    "/bg_discover.png",
+    "/chair_bg.svg", 
+    "/homeBg.svg",
+    "/person.jpg",
+    "/podCast.svg"
   ]
 
   // Rotate images every second

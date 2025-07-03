@@ -109,7 +109,7 @@ export default function SparseCausalityGuidancePost() {
           For each agent aᵢ at step t, the input context Cᵢ,ₜ is augmented:
           <div className="overflow-x-auto mb-4 flex justify-center">
             <img
-              src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/causal-hint-equation.png"
+              src="/images/causal-hint-equation.png"
               alt="Mathematical equation for augmented input context: C_i,t = BaseContext_i,t + Sum[(u,v) in E_t] lambda_u,v * CausalHint(u,v)"
               className="max-w-full h-auto"
             />

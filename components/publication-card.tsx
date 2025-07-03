@@ -30,7 +30,7 @@ export function PublicationCard({ publication, viewMode }: PublicationCardProps)
       {publication.image && (
         <div className="aspect-square w-full relative overflow-hidden bg-black flex items-center justify-center">
           <img
-            src={publication.image || "https://eurusworkflows.blob.core.windows.net/eurusworkflows/placeholder.svg"}
+            src={publication.image || "/placeholder.svg"}
             alt={`Preview image for ${publication.title}`}
             className="object-cover w-full h-full rounded-lg"
           />

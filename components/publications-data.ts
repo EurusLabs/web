@@ -57,7 +57,7 @@ export const publicationsData = [
       "As we move through 2025, the AI landscape continues to evolve at an unprecedented pace. From breakthroughs in generative models to new applications in healthcare and finance, the possibilities seem endless. In this blog post, we explore the key trends shaping the future of artificial intelligence.",
     category: "blog",
     readPaperLink: "#",
-    image: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/stochastic-splats-new.jpeg",
+    image: "/images/stochastic-splats-new.jpeg",
   },
   {
     id: "6",
@@ -69,6 +69,6 @@ export const publicationsData = [
       "We're excited to announce the launch of our new research initiative focused on advancing the frontiers of artificial intelligence. This initiative will bring together leading researchers and practitioners to tackle some of the most challenging problems in AI today.",
     category: "announcements",
     readPaperLink: "#",
-    image: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/latent-loop-optimization-new.jpeg",
+    image: "/images/latent-loop-optimization-new.jpeg",
   },
 ]

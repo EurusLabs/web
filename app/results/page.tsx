@@ -31,7 +31,7 @@ function ResultsContent() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url(https://eurusworkflows.blob.core.windows.net/eurusworkflows/chair_bg.svg)",
+          backgroundImage: "url(/chair_bg.svg)",
         }}
       />
 

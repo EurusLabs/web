@@ -17,7 +17,7 @@ export function EurusStudiosSection() {
             playsInline
             className="w-full h-full object-cover"
           >
-            <source src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/videos/eurusstudio.mp4" type="video/mp4" />
+            <source src="/videos/eurusstudio.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </div>
