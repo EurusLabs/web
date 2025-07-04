@@ -13,7 +13,6 @@ const nextConfig = {
   ...(process.env.NODE_ENV === 'production' && {
     output: 'export',
     trailingSlash: true,
-    distDir: 'out',
   }),
   // Exclude problematic files from file watching
   webpack: (config, { dev, isServer }) => {
