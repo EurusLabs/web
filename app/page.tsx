@@ -513,8 +513,8 @@ function ProductsScrollSectionStudioLanding() {
   const products = [
     { name: 'Eidos', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract4.mp4', description: 'Eidos is the world-leading generative AI for text, code, and more.', link: 'https://eidos.press/' },
     { name: 'Relay', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract1.mp4', description: 'Relay brings next-gen video and image generation to creators.', link: 'https://www.relayedstories.com/' },
-    { name: 'Studio', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract3.mp4', description: 'Studio is a powerful AI for video understanding and creative editing.', link: '/studio' },
-    { name: 'Draft', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract2.mp4', description: 'Draft enables advanced audio and speech synthesis for your projects.', link: '/draft' },
+    { name: 'Studio', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract3.mp4', description: 'Studio is a powerful AI for video understanding and creative editing.', link: 'https://kind-mud-06307e40f.2.azurestaticapps.net' },
+    { name: 'Draft', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract2.mp4', description: 'Draft enables advanced audio and speech synthesis for your projects.', link: 'https://red-forest-0721f660f.6.azurestaticapps.net/' },
   ];
   const [current, setCurrent] = React.useState(0);
   const containerRef = React.useRef<HTMLDivElement>(null);

@@ -138,7 +138,7 @@ export default function Navigation({ forceWhite = false }: NavigationProps) {
             { label: "Product", isDropdown: true, items: [
               { name: "Eidos", href: "https://eidos.press/", external: true },
               { name: "Studio", href: "/eurus-studio" },
-              { name: "Draft", href: "/draft" },
+              { name: "Draft", href: "https://red-forest-0721f660f.6.azurestaticapps.net/" },
               { name: "Relay", href: "https://www.relayedstories.com/", external: true }
             ]},
             { label: "Publications", isDropdown: true, items: [

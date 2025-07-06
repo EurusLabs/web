@@ -43,8 +43,8 @@ export default function Footer() {
           {/* Products vertical */}
           <div className="flex flex-col items-start gap-2">
             <div className="font-bold text-lg">PRODUCTS</div>
-            <a href="/studio" className="hover:underline">Studio</a>
-            <a href="/draft" className="hover:underline">Draft</a>
+            <a href="https://kind-mud-06307e40f.2.azurestaticapps.net" target="_blank" rel="noopener noreferrer" className="hover:underline">Studio</a>
+            <a href="https://red-forest-0721f660f.6.azurestaticapps.net/" target="_blank" rel="noopener noreferrer" className="hover:underline">Draft</a>
             <a href="https://www.relayedstories.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">Relay</a>
             <a href="https://eidos.press/" target="_blank" rel="noopener noreferrer" className="hover:underline">Eidos</a>
           </div>
