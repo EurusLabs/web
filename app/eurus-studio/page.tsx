@@ -119,11 +119,11 @@ export default function EurusStudioPage() {
                 {toolImages[currentImageIdx].is3D ? (
                   <div 
                     key={`3d-${currentImageIdx}-${activeImage}`}
-                    className="absolute inset-0 w-screen h-full flex items-center justify-center"
+                    className="absolute inset-0 h-full flex items-center justify-center"
                     style={{ 
                       animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
-                      left: '0',
-                      right: '0'
+                      marginLeft: '200px',
+                      width: 'calc(100% - 200px)'
                     }}
                   >
                     <div
@@ -152,9 +152,11 @@ export default function EurusStudioPage() {
                 ) : toolImages[currentImageIdx].isVideo ? (
                   <div 
                     key={`video-${currentImageIdx}-${activeImage}`}
-                    className="w-full h-full flex items-center justify-center relative"
+                    className="h-full flex items-center justify-center relative"
                     style={{ 
-                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards'
+                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
+                      marginLeft: '200px',
+                      width: 'calc(100% - 200px)'
                     }}
                   >
                     <video
@@ -172,11 +174,13 @@ export default function EurusStudioPage() {
                 ) : (
                   <div 
                     key={`image-${currentImageIdx}-${activeImage}`}
-                    className={`w-full h-full flex items-center justify-center relative ${
+                    className={`h-full flex items-center justify-center relative ${
                       toolImages[currentImageIdx].label === 'Original' ? 'bg-black' : ''
                     }`}
                     style={{ 
-                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards'
+                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
+                      marginLeft: '200px',
+                      width: 'calc(100% - 200px)'
                     }}
                   >
                     <img
@@ -196,13 +200,13 @@ export default function EurusStudioPage() {
                 )}
               </div>
               
-                                          {/* Title text overlay - in front of media */}
-              <div className="absolute top-8 left-1/2 transform -translate-x-1/2 pointer-events-none z-50">
-                <div className="text-center">
-                  <h2 className={`text-5xl md:text-7xl font-extrabold mb-2 leading-tight ${
+                                          {/* Title text overlay - CENTER TOP */}
+              <div className="absolute top-8 left-0 right-0 flex justify-center pointer-events-none z-50">
+                <div className="text-center" style={{ marginLeft: '100px' }}>
+                  <h2 className={`text-3xl md:text-4xl font-extrabold mb-2 leading-tight ${
                     ['Original', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black'
                   }`} style={{ letterSpacing: '-0.01em', fontFamily: 'var(--font-sf-pro)' }}>
-                    All the tools you trust. Now in one flow.
+                    All the tools you trust.<br />Now in one flow.
                   </h2>
                   <p className={`text-base md:text-lg font-light ${
                     ['Original', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white/90' : 'text-black/80'
@@ -227,7 +231,7 @@ export default function EurusStudioPage() {
               )}
 
               {/* Left side options list covering the image - always visible */}
-              <div className="absolute left-0 top-0 h-full flex items-center z-40">
+              <div className="absolute left-0 top-0 h-full flex items-center z-40 bg-white">
                 <div className="h-full flex items-center px-8">
                   <div className="flex flex-col gap-2">
                     {toolImages.map((tool, idx) => (
@@ -240,8 +244,8 @@ export default function EurusStudioPage() {
                         }}
                         className={`px-4 py-3 font-bold text-lg transition-all duration-200 focus:outline-none text-left ${
                           currentImageIdx === idx 
-                            ? (['Original', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black')
-                            : (['Original', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white/30 hover:text-white/60' : 'text-black/30 hover:text-black/60')
+                            ? 'text-black'
+                            : 'text-black/30 hover:text-black/60'
                         }`}
                         style={{ fontFamily: 'var(--font-sf-pro)', minWidth: '200px' }}
                       >
@@ -684,7 +688,7 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
           >
             {node.type === '3dimage' && (
               <div className="w-full h-full flex items-center justify-center">
-                <Canvas camera={{ position: [0, 0, 2.5] }} className="w-full h-full rounded-xl">
+                                  <Canvas camera={{ position: [0, 0, 2.5] }} className="w-full h-full rounded-xl">
                   <ambientLight intensity={0.5} />
                   <pointLight position={[10, 10, 10]} />
                   <React.Suspense fallback={
