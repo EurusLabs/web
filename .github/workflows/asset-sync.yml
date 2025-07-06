@@ -22,43 +22,69 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Debug Azure Connection
+        run: |
+          echo "Testing Azure connection..."
+          az account show
+          az storage account list --output table
+
       - name: Upload Assets to Azure
         run: |
-          # Install Azure CLI
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-
           # Create mappings file
           > url-mappings.txt
+
+          # Check if public directory exists and has files
+          if [ ! -d "public" ]; then
+            echo "Public directory does not exist"
+            exit 1
+          fi
+
+          file_count=$(find public -type f \( ! -name "*.html" \) | wc -l)
+          echo "Found $file_count files to upload"
+
+          if [ $file_count -eq 0 ]; then
+            echo "No files found to upload"
+            exit 0
+          fi
 
           # Upload files and generate mappings
           find public -type f \( ! -name "*.html" \) | while read -r file; do
             relative_path=${file#public/}
             echo "Uploading $file..."
             
-            # Upload file
-            az storage blob upload \
+            # Upload file with better error handling
+            if az storage blob upload \
               --account-name $AZURE_STORAGE_ACCOUNT \
               --container-name $AZURE_CONTAINER_NAME \
               --name "$relative_path" \
               --file "$file" \
               --auth-mode login \
-              --overwrite true
+              --overwrite true; then
+              
+              # Get the URL
+              url=$(az storage blob url \
+                --account-name $AZURE_STORAGE_ACCOUNT \
+                --container-name $AZURE_CONTAINER_NAME \
+                --name "$relative_path" \
+                --auth-mode login \
+                --output tsv)
 
-            # Get the URL
-            url=$(az storage blob url \
-              --account-name $AZURE_STORAGE_ACCOUNT \
-              --container-name $AZURE_CONTAINER_NAME \
-              --name "$relative_path" \
-              --auth-mode login \
-              --output tsv)
-
-            # Store the mapping
-            echo "/$relative_path|$url" >> url-mappings.txt
-            echo "Uploaded $file to $url"
+              # Store the mapping
+              echo "/$relative_path|$url" >> url-mappings.txt
+              echo "✅ Successfully uploaded $file to $url"
+            else
+              echo "❌ Failed to upload $file"
+              exit 1
+            fi
           done
 
       - name: Update Asset References
         run: |
+          if [ ! -f "url-mappings.txt" ]; then
+            echo "No URL mappings file found"
+            exit 0
+          fi
+
           # Update references in code
           while IFS='|' read -r old_path new_url; do
             # Remove any trailing whitespace
@@ -68,23 +94,36 @@ jobs:
             echo "Replacing $old_path with $new_url"
             
             # Use grep to find files containing the old path
-            grep -r --files-with-matches "$old_path" app/ components/ --exclude-dir={node_modules,.next} | while read -r file; do
-              # Replace the old path with the new URL
-              sed -i "s|$old_path|$new_url|g" "$file"
-              echo "Updated $file"
-            done
+            if grep -r --files-with-matches "$old_path" app/ components/ --exclude-dir={node_modules,.next} 2>/dev/null; then
+              grep -r --files-with-matches "$old_path" app/ components/ --exclude-dir={node_modules,.next} | while read -r file; do
+                # Replace the old path with the new URL
+                sed -i "s|$old_path|$new_url|g" "$file"
+                echo "Updated $file"
+              done
+            else
+              echo "No files found containing $old_path"
+            fi
           done < url-mappings.txt
 
       - name: Verify Upload
         id: verify
         run: |
+          if [ ! -f "url-mappings.txt" ]; then
+            echo "No URL mappings file found"
+            echo "verified=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           # Verify all files were uploaded
           all_uploaded=true
           while IFS='|' read -r old_path new_url; do
+            echo "Verifying $new_url..."
             status_code=$(curl -s -o /dev/null -w "%{http_code}" "$new_url")
             if [ "$status_code" != "200" ]; then
-              echo "Failed to verify $new_url (Status: $status_code)"
+              echo "❌ Failed to verify $new_url (Status: $status_code)"
               all_uploaded=false
+            else
+              echo "✅ Verified $new_url"
             fi
           done < url-mappings.txt
 
@@ -100,6 +139,11 @@ jobs:
       - name: Clean Up Public Directory
         if: steps.verify.outputs.verified == 'true'
         run: |
+          if [ ! -f "url-mappings.txt" ]; then
+            echo "No URL mappings file found"
+            exit 0
+          fi
+
           # Only remove files that were uploaded (keep .gitkeep)
           while IFS='|' read -r old_path new_url; do
             file_to_remove="public${old_path}"
@@ -115,5 +159,9 @@ jobs:
           git config --global user.name 'GitHub Actions Bot'
           git config --global user.email 'actions@github.com'
           git add -A
-          git commit -m "chore: sync assets to Azure and update references" || echo "No changes to commit"
-          git push
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: sync assets to Azure and update references"
+            git push
+          fi

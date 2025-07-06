@@ -38,8 +38,7 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stage, Environment } from '@react-three/drei';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { OrbitControls, Stage, Environment, useGLTF } from '@react-three/drei';
 
 // Dynamically import the scroll section component to avoid SSR issues
 const IdeasScrollNodesSection = dynamic(() => import('./IdeasScrollNodesSection'), {
@@ -65,6 +64,7 @@ export default function EurusStudioPage() {
   const [activeImage, setActiveImage] = useState('/images/main.png');
   const [imageLoaded, setImageLoaded] = useState(true);
   const [hovered, setHovered] = useState(false);
+  const [is3D, setIs3D] = useState(false);
   function handleNextImage() {
     const nextIdx = (currentImageIdx + 1) % toolImages.length;
     setCurrentImageIdx(nextIdx);
@@ -444,6 +444,7 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
     { id: 4, x: x2 - 250, y: y1, w: 300, h: 180, type: 'video', label: 'Video' }, // top-right, moved further right
     { id: 2, x: x1 + 30, y: y2 - 90, w: 260, h: 90, type: 'lut', label: 'LUT' }, // bottom-left
     { id: 3, x: x2 - 500, y: y2 - 300, w: 220, h: 300, type: 'image', label: 'Image' }, // bottom-right, moved further left
+    { id: 6, x: x1 + 350, y: y2 - 200, w: 220, h: 200, type: 'image2', label: 'Image 2' }, // new image node, positioned between existing nodes
   ];
   const [nodes, setNodes] = React.useState(initialNodes);
   const [draggingId, setDraggingId] = React.useState<number | null>(null);
@@ -453,10 +454,11 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
 
   // Connections: array of [fromId, toId]
   const connections = [
-    [2, 5], // video -> output
-    [3, 2], // text -> video
-    [3, 4], // image -> video (new)
-    [2, 1], // lut -> 3D (new)
+    [5, 3], // Text -> Image
+    [2, 3], // LUT -> Image
+    [3, 6], // Image -> Image 2
+    [6, 1], // Image 2 -> 3D
+    [6, 4], // Image 2 -> Video
   ];
 
   // Y position constraint: nodes cannot be moved above this Y (below the heading)
@@ -591,6 +593,7 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
             // Only trigger for specific node labels
             if (node.label === '3D') onNodeAction('3d');
             else if (node.label === 'Image') onNodeAction('remove-background');
+            else if (node.label === 'Image 2') onNodeAction('remove-background');
             else if (node.label === 'LUT') onNodeAction('level-rgb');
             else if (node.label === 'Video') onNodeAction('invert');
             // Add more mappings as needed
@@ -604,24 +607,41 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
             style={{ pointerEvents: 'auto', transition: draggingId === node.id ? 'none' : 'transform 0.2s ease-out, box-shadow 0.2s ease-out' }}
           >
             {node.type === '3dimage' && (
-              <InteractiveTiltImage src="/images/Subject.png" alt="3D Subject" />
+              <div className="w-full h-full flex items-center justify-center">
+                <Canvas camera={{ position: [0, 0, 2.5] }} className="w-full h-full rounded-xl">
+                  <ambientLight intensity={0.5} />
+                  <pointLight position={[10, 10, 10]} />
+                  <React.Suspense fallback={
+                    <mesh>
+                      <boxGeometry args={[1, 1, 1]} />
+                      <meshStandardMaterial color="gray" />
+                    </mesh>
+                  }>
+                    <Model3D url="/images/girl3D.glb" />
+                  </React.Suspense>
+                  <OrbitControls enablePan={false} enableZoom={false} />
+                </Canvas>
+              </div>
             )}
             {node.type === 'image' && (
-              <img src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/Gemini_Generated_Image_gyykvsgyykvsgyyk.png" alt="img" className="w-full h-full object-cover rounded-xl" />
+              <img src="/images/girlbnw.jpeg" alt="Girl B&W" className="w-full h-full object-cover rounded-xl" />
+            )}
+            {node.type === 'image2' && (
+              <img src="/images/girl.png" alt="Girl" className="w-full h-full object-cover rounded-xl" />
             )}
             {node.type === 'lut' && (
               <img src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/Whisk_storyboardf6f725941f3d455ebcef84c1.png" alt="lut" className="w-full h-full object-cover rounded-xl" />
             )}
             {node.type === 'video' && (
               <video 
-                src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/colour.mp4" 
+                src="/images/Can_you_show_202507060139.mp4" 
                 className="w-full h-full object-cover rounded-lg" 
                 autoPlay 
                 loop 
                 muted 
                 playsInline
               >
-                Your browser does not support the video tag or /images/colour.mp4 is missing.
+                Your browser does not support the video tag.
               </video>
             )}
             {node.type === 'text' && (
@@ -636,58 +656,20 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
 
 // 3D Model loader component
 function Model3D({ url }: { url: string }) {
-  const [gltf, setGltf] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const gltf = useGLTF(url);
   const ref = useRef<any>(null);
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    const loader = new GLTFLoader();
-    loader.load(
-      url,
-      (gltf: any) => {
-        setGltf(gltf);
-        setLoading(false);
-      },
-      undefined,
-      (err) => {
-        setError('Failed to load 3D model');
-        setLoading(false);
-      }
-    );
-  }, [url]);
-  if (loading || error) return null;
-  return gltf ? <primitive object={gltf.scene} ref={ref} scale={1.2} /> : null;
+
+  return <primitive object={gltf.scene} ref={ref} scale={1.5} position={[0, -1, 0]} />;
 }
 
-// Overlay for loading/error
+// Preload the 3D model
+useGLTF.preload('/images/girl3D.glb');
+
+// Overlay for loading/error - simplified since useGLTF handles loading states
 function Model3DOverlay({ url }: { url: string }) {
-  const [gltf, setGltf] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    const loader = new GLTFLoader();
-    loader.load(
-      url,
-      (gltf: any) => {
-        setGltf(gltf);
-        setLoading(false);
-      },
-      undefined,
-      (err) => {
-        setError('Failed to load 3D model');
-        setLoading(false);
-      }
-    );
-  }, [url]);
-  if (!loading && !error) return null;
   return (
     <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
-      {loading && <div className="text-white bg-black/80 px-4 py-2 rounded-2xl">Loading 3D…</div>}
-      {error && <div className="text-red-400 bg-black/80 px-4 py-2 rounded-2xl">{error}</div>}
+      <div className="text-white bg-black/80 px-4 py-2 rounded-2xl">Loading 3D…</div>
     </div>
   );
 }
