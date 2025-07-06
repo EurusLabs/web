@@ -165,7 +165,7 @@ export default function EurusStudioPage() {
                       }}
                     >
                       <Canvas 
-                        camera={{ position: [0, 0, 2.5] }} 
+                        camera={{ position: [0, 0, 3.2] }} 
                         className="w-full h-full" 
                         style={{ background: '#111' }}
                       >
@@ -776,8 +776,8 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
                     panSpeed={0}
                     rotateSpeed={1}
                     screenSpacePanning={false}
-                    minDistance={2.5}
-                    maxDistance={2.5}
+                    minDistance={3.2}
+                    maxDistance={3.2}
                   />
                 </Canvas>
               </div>
@@ -915,7 +915,7 @@ function Model3D({ url }: { url: string }) {
     }
   }, [mousePos]);
 
-  return <primitive object={gltf.scene} ref={ref} scale={1.5} position={[0, 0, 0]} />;
+  return <primitive object={gltf.scene} ref={ref} scale={1.05} position={[0, 0, 0]} />;
 }
 
 // Preload the 3D model
