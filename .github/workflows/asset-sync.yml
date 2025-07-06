@@ -10,8 +10,8 @@ on:
 env:
   AZURE_STORAGE_ACCOUNT: eurusworkflows
   AZURE_CONTAINER_NAME: eurusworkflows
-  # Temporarily disable Azure sync until credentials are fixed
-  SKIP_AZURE_SYNC: true
+  # Azure sync is now enabled for testing
+  SKIP_AZURE_SYNC: false
 
 jobs:
   sync-assets:
