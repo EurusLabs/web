@@ -37,7 +37,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Stage, Environment, useGLTF } from '@react-three/drei';
 
 // Dynamically import the scroll section component to avoid SSR issues
@@ -73,6 +73,8 @@ export default function EurusStudioPage() {
     setActiveImage(toolImages[nextIdx].image);
     setImageLoaded(false);
   }
+
+
 
 
 
@@ -131,21 +133,47 @@ export default function EurusStudioPage() {
                       onMouseMove={(e) => {
                         const rect = e.currentTarget.getBoundingClientRect();
                         const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-                        const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-                        // Store mouse position for 3D model rotation
+                        // Only store horizontal mouse position for 3D model rotation
                         const canvas = e.currentTarget.querySelector('canvas');
                         if (canvas) {
                           (canvas as any).mouseX = x;
-                          (canvas as any).mouseY = y;
+                          // Do NOT store mouseY to prevent pitch to zoom effect
                         }
                       }}
+                      onWheel={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onTouchStart={(e) => {
+                        if (e.touches.length > 1) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }
+                      }}
+                      onTouchMove={(e) => {
+                        if (e.touches.length > 1) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }
+                      }}
+                      style={{
+                        touchAction: 'none',
+                        userSelect: 'none',
+                        WebkitUserSelect: 'none',
+                        MozUserSelect: 'none',
+                        msUserSelect: 'none'
+                      }}
                     >
-                      <Canvas camera={{ position: [0, 0, 2.5] }} className="w-full h-full" style={{ background: '#111' }}>
+                      <Canvas 
+                        camera={{ position: [0, 0, 2.5] }} 
+                        className="w-full h-full" 
+                        style={{ background: '#111' }}
+                      >
                         <ambientLight intensity={1.2} />
                         <directionalLight position={[2, 4, 2]} intensity={1.5} castShadow />
                         <Environment preset="city" />
                         <Model3D url={activeImage} />
-                        <OrbitControls enablePan={false} />
+                        <RotationOnlyControls />
                       </Canvas>
                     </div>
                   </div>
@@ -507,6 +535,7 @@ function InfiniteCanvasBackground() {
 }
 
 function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) => void }) {
+  const smallOrbitControlsRef = useRef<any>(null);
   // Node definitions
   // Clean, sophisticated layout under the title with proper spacing
   // Canvas area: starts below title (y=280) and spreads across viewport
@@ -621,6 +650,44 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
     }
   }
 
+  // Programmatically disable zoom on small OrbitControls
+  React.useEffect(() => {
+    if (smallOrbitControlsRef.current) {
+      const controls = smallOrbitControlsRef.current;
+      
+      // Force disable all zoom functionality
+      controls.enableZoom = false;
+      controls.zoomSpeed = 0;
+      controls.minDistance = 2.5;
+      controls.maxDistance = 2.5;
+      
+      // Remove zoom event listeners
+      const domElement = controls.domElement;
+      if (domElement) {
+        const preventZoom = (e: Event) => {
+          e.preventDefault();
+          e.stopPropagation();
+        };
+        
+        domElement.addEventListener('wheel', preventZoom, { passive: false });
+        domElement.addEventListener('touchstart', preventZoom, { passive: false });
+        domElement.addEventListener('touchmove', preventZoom, { passive: false });
+        domElement.addEventListener('gesturestart', preventZoom, { passive: false });
+        domElement.addEventListener('gesturechange', preventZoom, { passive: false });
+        domElement.addEventListener('gestureend', preventZoom, { passive: false });
+        
+        return () => {
+          domElement.removeEventListener('wheel', preventZoom);
+          domElement.removeEventListener('touchstart', preventZoom);
+          domElement.removeEventListener('touchmove', preventZoom);
+          domElement.removeEventListener('gesturestart', preventZoom);
+          domElement.removeEventListener('gesturechange', preventZoom);
+          domElement.removeEventListener('gestureend', preventZoom);
+        };
+      }
+    }
+  }, []);
+
   // Helper to get node center
   function getNodeCenter(node: any) {
     return { x: node.x + node.w / 2, y: node.y + node.h / 2 };
@@ -699,7 +766,19 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
                   }>
                     <Model3D url="/images/girl3D.glb" />
                   </React.Suspense>
-                  <OrbitControls enablePan={false} enableZoom={false} />
+                  <OrbitControls 
+                    ref={smallOrbitControlsRef}
+                    enablePan={false} 
+                    enableZoom={false} 
+                    enableDamping={false}
+                    enableRotate={true}
+                    zoomSpeed={0}
+                    panSpeed={0}
+                    rotateSpeed={1}
+                    screenSpacePanning={false}
+                    minDistance={2.5}
+                    maxDistance={2.5}
+                  />
                 </Canvas>
               </div>
             )}
@@ -734,6 +813,78 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
   );
 }
 
+// Custom rotation-only controls (no zoom functionality)
+function RotationOnlyControls() {
+  const { camera, gl } = useThree();
+  const [isDragging, setIsDragging] = useState(false);
+  const [lastMouse, setLastMouse] = useState({ x: 0, y: 0 });
+  
+  useEffect(() => {
+    const canvas = gl.domElement;
+    
+    const handleMouseDown = (e: MouseEvent) => {
+      setIsDragging(true);
+      setLastMouse({ x: e.clientX, y: e.clientY });
+    };
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      
+      const deltaX = e.clientX - lastMouse.x;
+      const deltaY = e.clientY - lastMouse.y;
+      
+      // Store current position before rotation
+      const currentX = camera.position.x;
+      const currentZ = camera.position.z;
+      
+      // Rotate around Y axis (horizontal mouse movement) - only horizontal rotation
+      const angle = deltaX * 0.01;
+      camera.position.x = currentX * Math.cos(angle) - currentZ * Math.sin(angle);
+      camera.position.z = currentX * Math.sin(angle) + currentZ * Math.cos(angle);
+      
+      // NO vertical movement or Y-axis changes - this was causing the "pitch to zoom" effect
+      // Keep the camera at the same distance and height
+      
+      camera.lookAt(0, 0, 0);
+      setLastMouse({ x: e.clientX, y: e.clientY });
+    };
+    
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+    
+    // Prevent all zoom events
+    const preventZoom = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    
+    canvas.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('wheel', preventZoom, { passive: false });
+    canvas.addEventListener('touchstart', preventZoom, { passive: false });
+    canvas.addEventListener('touchmove', preventZoom, { passive: false });
+    canvas.addEventListener('gesturestart', preventZoom, { passive: false });
+    canvas.addEventListener('gesturechange', preventZoom, { passive: false });
+    canvas.addEventListener('gestureend', preventZoom, { passive: false });
+    
+    return () => {
+      canvas.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      canvas.removeEventListener('wheel', preventZoom);
+      canvas.removeEventListener('touchstart', preventZoom);
+      canvas.removeEventListener('touchmove', preventZoom);
+      canvas.removeEventListener('gesturestart', preventZoom);
+      canvas.removeEventListener('gesturechange', preventZoom);
+      canvas.removeEventListener('gestureend', preventZoom);
+    };
+  }, [camera, gl, isDragging, lastMouse]);
+  
+  return null;
+}
+
 // 3D Model loader component
 function Model3D({ url }: { url: string }) {
   const gltf = useGLTF(url);
@@ -747,7 +898,7 @@ function Model3D({ url }: { url: string }) {
       if (canvas && (canvas as any).mouseX !== undefined) {
         setMousePos({
           x: (canvas as any).mouseX || 0,
-          y: (canvas as any).mouseY || 0
+          y: 0  // IGNORE vertical mouse movement to prevent pitch to zoom
         });
       }
     };
@@ -756,11 +907,11 @@ function Model3D({ url }: { url: string }) {
     return () => clearInterval(interval);
   }, []);
 
-  // Apply rotation to the model
+  // Apply rotation to the model - ONLY horizontal rotation
   React.useEffect(() => {
     if (ref.current) {
-      ref.current.rotation.y = mousePos.x * 0.5; // Horizontal rotation
-      ref.current.rotation.x = mousePos.y * 0.3; // Vertical rotation
+      ref.current.rotation.y = mousePos.x * 0.5; // Horizontal rotation only
+      // NO vertical rotation to prevent pitch to zoom effect
     }
   }, [mousePos]);
 
