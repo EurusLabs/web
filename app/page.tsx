@@ -639,20 +639,20 @@ function ProductsScrollSectionStudioLanding() {
               href={p.link}
               target="_blank"
               rel="noopener noreferrer"
-              className={`text-5xl md:text-7xl font-bold transition-all duration-300 text-right no-underline ${current === i ? 'text-yellow-200' : 'text-white/80'}`}
+              className={`text-5xl md:text-7xl font-bold transition-all duration-300 text-right no-underline hover:scale-105 ${current === i ? 'text-yellow-200' : 'text-white/80 hover:text-white'}`}
               style={{ fontFamily: 'var(--font-sf-pro)', opacity: current === i ? 1 : 0.7, pointerEvents: 'auto', textDecoration: 'none' }}
             >
               {p.name}
             </a>
           ) : (
-            <a
+            <Link
               key={p.name}
               href={p.link}
-              className={`text-5xl md:text-7xl font-bold transition-all duration-300 text-right no-underline ${current === i ? 'text-yellow-200' : 'text-white/80'}`}
+              className={`text-5xl md:text-7xl font-bold transition-all duration-300 text-right no-underline hover:scale-105 ${current === i ? 'text-yellow-200' : 'text-white/80 hover:text-white'}`}
               style={{ fontFamily: 'var(--font-sf-pro)', opacity: current === i ? 1 : 0.7, pointerEvents: 'auto', textDecoration: 'none' }}
             >
               {p.name}
-            </a>
+            </Link>
           )
         ))}
       </div>
