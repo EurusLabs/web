@@ -18,7 +18,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="relative w-full text-white overflow-hidden" style={{ minHeight: '220px', borderTopLeftRadius: '2.5rem', borderTopRightRadius: '2.5rem', fontFamily: 'var(--font-sf-pro)' }}>
+    <footer className="relative w-full text-white overflow-hidden" style={{ minHeight: '140px', borderTopLeftRadius: '2.5rem', borderTopRightRadius: '2.5rem', fontFamily: 'var(--font-sf-pro)' }}>
       {/* Video background */}
       <video
         ref={videoRef}
@@ -33,13 +33,13 @@ export default function Footer() {
       {/* Overlay for readability */}
       <div className="absolute inset-0 bg-black/70 z-10" style={{ borderTopLeftRadius: '2.5rem', borderTopRightRadius: '2.5rem' }} />
       {/* Footer content */}
-      <div className="relative z-20 w-full max-w-7xl mx-auto px-8 py-10 flex flex-col gap-8">
+      <div className="relative z-20 w-full max-w-7xl mx-auto px-8 py-6 flex flex-col gap-4">
         {/* Documents row - top right */}
         <div className="flex flex-row w-full justify-end items-start">
-          <span className="font-semibold text-base opacity-80">Documents</span>
+          <a href="https://eurus-labs.gitbook.io/eurus-labs/getting-started/quickstart" target="_blank" rel="noopener noreferrer" className="font-semibold text-base opacity-80 hover:opacity-100 hover:underline">Documents</a>
         </div>
         {/* Verticals - left aligned */}
-        <div className="flex flex-row items-start gap-16 text-left">
+        <div className="flex flex-row items-start gap-12 text-left">
           {/* Products vertical */}
           <div className="flex flex-col items-start gap-2">
             <div className="font-bold text-lg">PRODUCTS</div>
@@ -51,7 +51,7 @@ export default function Footer() {
           {/* Company vertical */}
           <div className="flex flex-col items-start gap-2">
             <div className="font-bold text-lg">COMPANY</div>
-            <a href="/about" className="hover:underline">About</a>
+            <a href="https://eurus-labs.gitbook.io/eurus-labs/getting-started/quickstart" target="_blank" rel="noopener noreferrer" className="hover:underline">About</a>
             <a href="/careers" className="hover:underline">Careers</a>
             <a href="/contact" className="hover:underline">Contact</a>
           </div>
@@ -63,6 +63,10 @@ export default function Footer() {
             <a href="https://www.instagram.com/euruslabs/" target="_blank" rel="noopener noreferrer" className="hover:underline">Instagram</a>
             <a href="https://discord.gg/Y4PEMhas" target="_blank" rel="noopener noreferrer" className="hover:underline">Discord</a>
           </div>
+        </div>
+        {/* Copyright - bottom right */}
+        <div className="flex flex-row w-full justify-end items-end mt-2">
+          <span className="text-sm opacity-60">Eurus Labs 2025 © </span>
         </div>
       </div>
     </footer>

@@ -124,6 +124,36 @@ body {
   animation: slide-in-right 0.5s ease-out;
 }
 
+@keyframes pullIn {
+  0% {
+    transform: translateX(100%) scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(-5%) scale(1.02);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pullInLeft {
+  0% {
+    transform: translateX(-100%) scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(5%) scale(1.02);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
 @keyframes scroll-left {
   from {
     transform: translateX(0);

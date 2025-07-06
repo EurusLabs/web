@@ -16,11 +16,10 @@ export default function GetStartedPage() {
 
   // Images for rotating background
   const backgroundImages = [
-    "/bg_discover.png",
-    "/chair_bg.svg", 
-    "/homeBg.svg",
-    "/person.jpg",
-    "/podCast.svg"
+    "/images/1.jpg",
+    "/images/2.jpg",
+    "/images/3.jpg",
+    "/images/4.jpg"
   ]
 
   // Rotate images every second
@@ -176,9 +175,9 @@ export default function GetStartedPage() {
           </div>
         </div>
         
-        {/* Logo */}
+        {/* Logo - removed text but keeping space for menu bar */}
         <div className="absolute top-8 left-8">
-          <h2 className="text-white text-2xl font-light">Eurus Labs</h2>
+          {/* Menu bar space preserved */}
         </div>
       </div>
 

@@ -52,18 +52,20 @@ const IdeasScrollNodesSection = dynamic(() => import('./IdeasScrollNodesSection'
 
 export default function EurusStudioPage() {
   const toolImages = [
-    { label: 'Original', image: '/images/main.png' },
-    { label: 'Remove Background', image: '/images/main.nobackground.png' },
-    { label: 'Crop', image: '/images/main.png' },
-    { label: 'LUT', image: '/images/main.blackandwhite.png' },
-    { label: 'Invert', image: '/images/main.invert.png' },
-    { label: '3D', image: '/images/main.3B.glb', is3D: true },
-    { label: 'Level RGB', image: '/images/main.level.png' },
+    { label: 'Video', image: '/images/topvideo.mp4', isVideo: true },
+    { label: 'Original', image: '/images/topcrop.png' },
+    { label: 'Extend', image: '/images/topbg.jpeg' },
+    { label: 'Invert', image: '/images/topinvert.png' },
+    { label: 'Image Describer', image: '/images/top.jpg', hasTextOverlay: true },
+    { label: 'Paint', image: '/images/toppaint.png' },
+    { label: 'Depth Extractor', image: '/images/topz.png' },
+    { label: '3D', image: '/images/top3D.glb', is3D: true },
+    { label: 'LUT', image: '/images/toplut.jpeg' },
+    { label: 'Prompt a change', image: '/images/top.jpg' },
   ];
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
-  const [activeImage, setActiveImage] = useState('/images/main.png');
+  const [activeImage, setActiveImage] = useState('/images/topvideo.mp4');
   const [imageLoaded, setImageLoaded] = useState(true);
-  const [hovered, setHovered] = useState(false);
   const [is3D, setIs3D] = useState(false);
   function handleNextImage() {
     const nextIdx = (currentImageIdx + 1) % toolImages.length;
@@ -71,6 +73,8 @@ export default function EurusStudioPage() {
     setActiveImage(toolImages[nextIdx].image);
     setImageLoaded(false);
   }
+
+
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col font-sf-pro" style={{ borderBottomLeftRadius: '2.5rem', borderBottomRightRadius: '2.5rem', overflow: 'hidden' }}>
@@ -106,89 +110,154 @@ export default function EurusStudioPage() {
         </section>
 
         {/* Section: With all the professional tools you rely on */}
-        <section className="w-full min-h-[60vh] py-20 flex flex-col items-center justify-start bg-black font-sf-pro" style={{ fontFamily: 'Inter, SF Pro, sans-serif' }}>
-          <div className="w-full max-w-6xl flex flex-col md:flex-row items-center md:items-end justify-between mb-8 px-4">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-2 leading-tight" style={{ letterSpacing: '-0.01em' }}>
-                All the tools you trust. Now in one flow.
-              </h2>
-              <p className="text-lg md:text-xl font-light text-white/80 mb-0">
-                From cropping to relighting—designed for flow.
-              </p>
-            </div>
-          </div>
-          {/* Main Image with hover button */}
-          <div className="w-full flex flex-col items-center justify-center">
-            <div
-              className="relative w-[900px] h-[540px] flex items-center justify-center overflow-hidden rounded-2xl shadow-2xl border border-white/10 bg-black group"
-              onMouseEnter={() => setHovered(true)}
-              onMouseLeave={() => setHovered(false)}
-            >
-              {toolImages[currentImageIdx].is3D ? (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Canvas camera={{ position: [0, 0, 2.5] }} className="w-full h-full rounded-2xl" style={{ background: '#111' }}>
-                    <ambientLight intensity={1.2} />
-                    <directionalLight position={[2, 4, 2]} intensity={1.5} castShadow />
-                    <Environment preset="city" />
-                    <Stage environment={null} intensity={0.8}>
-                      <Model3D url={activeImage} />
-                    </Stage>
-                    <OrbitControls enablePan={false} />
-                  </Canvas>
-                  {/* Optionally, you can add a loading overlay for 3D here if needed */}
-                </div>
-              ) : toolImages[currentImageIdx].label === 'Crop' ? (
-                <div className="w-full h-full flex items-center justify-center">
-                  <img
-                    key={activeImage}
-                    src={activeImage}
-                    alt={toolImages[currentImageIdx].label}
-                    className="object-cover rounded-2xl transition-opacity duration-500"
-                    style={{ width: '340px', height: '340px', opacity: imageLoaded ? 1 : 0, transition: 'opacity 0.5s' }}
-                    onLoad={() => setImageLoaded(true)}
-                    onError={() => setImageLoaded(true)}
-                  />
-                </div>
-              ) : (
-                <img
-                  key={activeImage}
-                  src={activeImage}
-                  alt={toolImages[currentImageIdx].label}
-                  className="w-full h-full object-cover rounded-2xl transition-opacity duration-500"
-                  style={{ opacity: imageLoaded ? 1 : 0, transition: 'opacity 0.5s' }}
-                  onLoad={() => setImageLoaded(true)}
-                  onError={() => setImageLoaded(true)}
-                />
-              )}
-              {/* Hover overlay with all tool buttons, top-left aligned */}
-              <div
-                className={`absolute top-0 left-0 w-full h-full flex items-start justify-start transition-opacity duration-300 ${hovered ? 'opacity-100' : 'opacity-0'} focus:opacity-100`}
-                style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.22) 60%, rgba(0,0,0,0.08) 100%)', pointerEvents: hovered ? 'auto' : 'none' }}
-              >
-                <div className="mt-8 ml-8 flex flex-wrap gap-3 justify-start items-center">
-                  {toolImages.map((tool, idx) => (
-                    <button
-                      key={tool.label}
-                      onClick={() => {
-                        setCurrentImageIdx(idx);
-                        setActiveImage(tool.image);
-                        setImageLoaded(false);
+        <section className="w-screen h-screen flex items-center justify-center bg-black font-sf-pro relative" style={{ fontFamily: 'Inter, SF Pro, sans-serif' }}>
+          {/* Full screen media with overlay text and side options */}
+          <div
+            className="relative w-full h-full flex items-center justify-center overflow-hidden bg-black group"
+          >
+              <div className="w-full h-full relative overflow-hidden z-10">
+                {toolImages[currentImageIdx].is3D ? (
+                  <div 
+                    key={`3d-${currentImageIdx}-${activeImage}`}
+                    className="absolute inset-0 w-screen h-full flex items-center justify-center"
+                    style={{ 
+                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
+                      left: '0',
+                      right: '0'
+                    }}
+                  >
+                    <div
+                      className="w-full h-full"
+                      onMouseMove={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+                        const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+                        // Store mouse position for 3D model rotation
+                        const canvas = e.currentTarget.querySelector('canvas');
+                        if (canvas) {
+                          (canvas as any).mouseX = x;
+                          (canvas as any).mouseY = y;
+                        }
                       }}
-                      className={`px-6 py-2 rounded-full border border-neutral-700 font-medium text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 hover:shadow-lg hover:border-white/40 ${currentImageIdx === idx ? 'bg-white/90 text-black border-white/80 shadow-lg' : 'bg-black/40 text-white/90'}`}
-                      style={{ fontFamily: 'Inter, SF Pro, sans-serif', boxShadow: currentImageIdx === idx ? '0 0 16px 2px #fff2' : undefined }}
                     >
-                      {tool.label}
-                    </button>
-                  ))}
+                      <Canvas camera={{ position: [0, 0, 2.5] }} className="w-full h-full" style={{ background: '#111' }}>
+                        <ambientLight intensity={1.2} />
+                        <directionalLight position={[2, 4, 2]} intensity={1.5} castShadow />
+                        <Environment preset="city" />
+                        <Model3D url={activeImage} />
+                        <OrbitControls enablePan={false} />
+                      </Canvas>
+                    </div>
+                  </div>
+                ) : toolImages[currentImageIdx].isVideo ? (
+                  <div 
+                    key={`video-${currentImageIdx}-${activeImage}`}
+                    className="w-full h-full flex items-center justify-center relative"
+                    style={{ 
+                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards'
+                    }}
+                  >
+                    <video
+                      key={activeImage}
+                      src={activeImage}
+                      className="w-full h-full object-cover"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      onLoadedData={() => setImageLoaded(true)}
+                      onError={() => setImageLoaded(true)}
+                    />
+                  </div>
+                ) : (
+                  <div 
+                    key={`image-${currentImageIdx}-${activeImage}`}
+                    className={`w-full h-full flex items-center justify-center relative ${
+                      toolImages[currentImageIdx].label === 'Original' ? 'bg-black' : ''
+                    }`}
+                    style={{ 
+                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards'
+                    }}
+                  >
+                    <img
+                      key={activeImage}
+                      src={activeImage}
+                      alt={toolImages[currentImageIdx].label}
+                      className={`${
+                        toolImages[currentImageIdx].label === 'Original' 
+                          ? 'max-w-full max-h-full object-contain' 
+                          : 'w-full h-full object-cover'
+                      }`}
+                      onLoad={() => setImageLoaded(true)}
+                      onError={() => setImageLoaded(true)}
+                    />
+
+                  </div>
+                )}
+              </div>
+              
+                                          {/* Title text overlay - in front of media */}
+              <div className="absolute top-8 left-1/2 transform -translate-x-1/2 pointer-events-none z-50">
+                <div className="text-center">
+                  <h2 className={`text-5xl md:text-7xl font-extrabold mb-2 leading-tight ${
+                    ['Original', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black'
+                  }`} style={{ letterSpacing: '-0.01em', fontFamily: 'var(--font-sf-pro)' }}>
+                    All the tools you trust. Now in one flow.
+                  </h2>
+                  <p className={`text-base md:text-lg font-light ${
+                    ['Original', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white/90' : 'text-black/80'
+                  }`} style={{ fontFamily: 'var(--font-sf-pro)' }}>
+                    From cropping to relighting—designed for flow.
+                  </p>
+
                 </div>
               </div>
+
+              {/* Image description for Image Describer */}
+              {toolImages[currentImageIdx].hasTextOverlay && (
+                <div className="absolute right-0 top-0 h-full flex items-center pointer-events-none z-30">
+                  <div className="text-right max-w-md pr-8">
+                    <p className={`text-lg md:text-xl font-medium leading-relaxed ${
+                      ['Original', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black'
+                    }`} style={{ fontFamily: 'var(--font-sf-pro)' }}>
+                      The image shows a beautifully crafted wooden spinning top placed upright on a flat, textured surface. The top is made of polished wood with rich, natural grain patterns and a warm, amber-brown hue.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Left side options list covering the image - always visible */}
+              <div className="absolute left-0 top-0 h-full flex items-center z-40">
+                <div className="h-full flex items-center px-8">
+                  <div className="flex flex-col gap-2">
+                    {toolImages.map((tool, idx) => (
+                      <button
+                        key={tool.label}
+                        onClick={() => {
+                          setCurrentImageIdx(idx);
+                          setActiveImage(tool.image);
+                          setImageLoaded(true);
+                        }}
+                        className={`px-4 py-3 font-bold text-lg transition-all duration-200 focus:outline-none text-left ${
+                          currentImageIdx === idx 
+                            ? (['Original', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black')
+                            : (['Original', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white/30 hover:text-white/60' : 'text-black/30 hover:text-black/60')
+                        }`}
+                        style={{ fontFamily: 'var(--font-sf-pro)', minWidth: '200px' }}
+                      >
+                        {tool.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
               {!imageLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center text-white/60 bg-black/60 rounded-2xl">
+                <div className="absolute inset-0 flex items-center justify-center text-white/60 bg-black/60">
                   Loading…
                 </div>
               )}
             </div>
-          </div>
         </section>
 
         {/* Section: Control the Outcome */}
@@ -201,8 +270,8 @@ export default function EurusStudioPage() {
 
 function ProductsScrollSectionStudio() {
   const products = [
-    { name: 'GPT', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person1.mp4', description: 'GPT is the world-leading generative AI for text, code, and more.' },
-    { name: 'Runway Gen-4', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person3.mp4', description: 'Runway Gen-4 brings next-gen video and image generation to creators.' },
+    { name: 'Eleven Labs', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person1.mp4', description: 'Eleven Labs is the world-leading generative AI for voice synthesis and audio.' },
+    { name: 'Rodin', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person3.mp4', description: 'Rodin brings next-gen 3D generation and modeling to creators.' },
     { name: 'Veo 3', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/peron2.mp4', description: 'Veo 3 is a powerful AI for video understanding and creative editing.' },
     { name: 'Kling', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person4.mp4', description: 'Kling enables advanced audio and speech synthesis for your projects.' },
     { name: 'Luma ray 2', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/peron5.mp4', description: 'Luma ray 2 delivers photorealistic 3D and lighting effects with AI.' },
@@ -241,7 +310,7 @@ function ProductsScrollSectionStudio() {
       return;
     }
     
-    // If scrolling up and we're at the first item (GPT), allow page scroll  
+    // If scrolling up and we're at the first item (Eleven Labs), allow page scroll  
     if (direction < 0 && current === 0) {
       // Let the page scroll to previous section
       return;
@@ -397,7 +466,7 @@ function ProductsScrollSectionStudio() {
       </div>
       {/* Center bottom text */}
       <div className="absolute left-1/2 bottom-10 -translate-x-1/2 z-30 pointer-events-none">
-        <span className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg bg-black/40 px-6 py-2 rounded-full" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+        <span className="text-lg md:text-xl font-medium text-white drop-shadow-lg" style={{ fontFamily: 'var(--font-sf-pro)' }}>
           30+ models in one canvas
         </span>
       </div>
@@ -435,16 +504,23 @@ function InfiniteCanvasBackground() {
 
 function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) => void }) {
   // Node definitions
-  // Evenly spaced around a rectangle under the title, no overlaps
-  // Rectangle: top-left (x1, y1), bottom-right (x2, y2)
-  const x1 = 200, y1 = 320, x2 = 1000, y2 = 700;
+  // Clean, sophisticated layout under the title with proper spacing
+  // Canvas area: starts below title (y=280) and spreads across viewport
+  const canvasWidth = 1200;
+  const canvasHeight = 500;
+  const startX = 100;
+  const startY = 280;
+  
   const initialNodes = [
-    { id: 1, x: x1, y: y1, w: 300, h: 180, type: '3dimage', label: '3D' }, // top-left, now same size as Video node
-    { id: 5, x: (x1 + x2) / 2 - 100, y: y1 - 80, w: 200, h: 60, type: 'text', label: 'Text' }, // top-center
-    { id: 4, x: x2 - 250, y: y1, w: 300, h: 180, type: 'video', label: 'Video' }, // top-right, moved further right
-    { id: 2, x: x1 + 30, y: y2 - 90, w: 260, h: 90, type: 'lut', label: 'LUT' }, // bottom-left
-    { id: 3, x: x2 - 500, y: y2 - 300, w: 220, h: 300, type: 'image', label: 'Image' }, // bottom-right, moved further left
-    { id: 6, x: x1 + 350, y: y2 - 200, w: 220, h: 200, type: 'image2', label: 'Image 2' }, // new image node, positioned between existing nodes
+    // Top row - evenly spaced
+    { id: 5, x: startX, y: startY, w: 180, h: 80, type: 'text', label: 'Text' }, // far left
+    { id: 2, x: startX + 220, y: startY, w: 160, h: 80, type: 'lut', label: 'LUT' }, // left-center
+    { id: 3, x: startX + 420, y: startY, w: 180, h: 120, type: 'image', label: 'Image' }, // center
+    { id: 6, x: startX + 640, y: startY, w: 180, h: 120, type: 'image2', label: 'Image 2' }, // right-center
+    
+    // Bottom row - centered
+    { id: 1, x: startX + 160, y: startY + 180, w: 240, h: 140, type: '3dimage', label: '3D' }, // bottom-left
+    { id: 4, x: startX + 440, y: startY + 180, w: 240, h: 140, type: 'video', label: 'Video' }, // bottom-right
   ];
   const [nodes, setNodes] = React.useState(initialNodes);
   const [draggingId, setDraggingId] = React.useState<number | null>(null);
@@ -452,17 +528,17 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
   const liveNodes = React.useRef(nodes);
   React.useEffect(() => { liveNodes.current = nodes; }, [nodes]);
 
-  // Connections: array of [fromId, toId]
+  // Connections: array of [fromId, toId] - clean flow from top to bottom
   const connections = [
-    [5, 3], // Text -> Image
-    [2, 3], // LUT -> Image
-    [3, 6], // Image -> Image 2
-    [6, 1], // Image 2 -> 3D
-    [6, 4], // Image 2 -> Video
+    [5, 3], // Text -> Image (top row to top row)
+    [2, 3], // LUT -> Image (top row to top row)
+    [3, 6], // Image -> Image 2 (top row to top row)
+    [6, 1], // Image 2 -> 3D (top row to bottom row)
+    [6, 4], // Image 2 -> Video (top row to bottom row)
   ];
 
   // Y position constraint: nodes cannot be moved above this Y (below the heading)
-  const minY = 180; // px, adjust as needed for your heading height
+  const minY = 250; // px, adjusted for clean spacing below the title
 
   // Store drag state in refs for smoothness
   const dragNodeRef = React.useRef<number | null>(null);
@@ -645,7 +721,7 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
               </video>
             )}
             {node.type === 'text' && (
-              <span className="text-gray-700 dark:text-gray-200 text-sm px-2">Greyscale</span>
+              <span className="text-gray-700 dark:text-gray-200 text-xs px-2 text-center leading-tight" style={{ fontFamily: 'var(--font-sf-pro)' }}>A black and white photo of a girl looking straight with her hair tied back.</span>
             )}
           </div>
         </div>
@@ -658,12 +734,37 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
 function Model3D({ url }: { url: string }) {
   const gltf = useGLTF(url);
   const ref = useRef<any>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  return <primitive object={gltf.scene} ref={ref} scale={1.5} position={[0, -1, 0]} />;
+  // Update rotation based on mouse position
+  React.useEffect(() => {
+    const handleMouseMove = () => {
+      const canvas = document.querySelector('canvas');
+      if (canvas && (canvas as any).mouseX !== undefined) {
+        setMousePos({
+          x: (canvas as any).mouseX || 0,
+          y: (canvas as any).mouseY || 0
+        });
+      }
+    };
+
+    const interval = setInterval(handleMouseMove, 16); // ~60fps
+    return () => clearInterval(interval);
+  }, []);
+
+  // Apply rotation to the model
+  React.useEffect(() => {
+    if (ref.current) {
+      ref.current.rotation.y = mousePos.x * 0.5; // Horizontal rotation
+      ref.current.rotation.x = mousePos.y * 0.3; // Vertical rotation
+    }
+  }, [mousePos]);
+
+  return <primitive object={gltf.scene} ref={ref} scale={1.5} position={[0, 0, 0]} />;
 }
 
 // Preload the 3D model
-useGLTF.preload('/images/girl3D.glb');
+useGLTF.preload('/images/top3D.glb');
 
 // Overlay for loading/error - simplified since useGLTF handles loading states
 function Model3DOverlay({ url }: { url: string }) {
