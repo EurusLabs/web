@@ -138,16 +138,16 @@ export default function Navigation({ forceWhite = false }: NavigationProps) {
             { label: "Product", isDropdown: true, items: [
               { name: "Eidos", href: "https://eidos.press/", external: true },
               { name: "Studio", href: "/eurus-studio" },
-              { name: "Draft", href: "http://localhost:3001", external: true },
+              { name: "Draft", href: "/draft" },
               { name: "Relay", href: "https://www.relayedstories.com/", external: true }
             ]},
             { label: "Publications", isDropdown: true, items: [
-              { name: "Research", href: "/publications" },
-              { name: "Announcements", href: "/announcements" },
-              { name: "Blog", href: "/blog" }
+              { name: "All", href: "/publications?category=all" },
+              { name: "Research", href: "/publications?category=research" },
+              { name: "Announcements", href: "/publications?category=announcements" },
+              { name: "Blog", href: "/publications?category=blog" }
             ]},
-            { label: "Manifesto", href: "/manifesto" },
-            { label: "Community", href: "/community" }
+            { label: "Manifesto", href: "/manifesto" }
           ].map((item, index) => (
             <div
               key={item.label}

@@ -1,7 +1,6 @@
 "use client"
 
 import Navigation from "../components/navigation"
-import Footer from "@/components/footer"
 
 const manifestoPoints = [
   "Curiosity is Purpose",
@@ -31,7 +30,6 @@ export default function ManifestoPage() {
           ))}
         </ul>
       </main>
-      <Footer />
     </div>
   )
 } 

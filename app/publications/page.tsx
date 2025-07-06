@@ -18,7 +18,7 @@ import {
 import Navigation from "../components/navigation"
 
 export default function PublicationsPage() {
-  const [activeCategory, setActiveCategory] = useState("research")
+  const [activeCategory, setActiveCategory] = useState("all")
   // Removed sortOrder and setSortOrder state
   const [viewMode, setViewMode] = useState<"list" | "grid">("grid") // Default to grid view
 
@@ -40,21 +40,25 @@ export default function PublicationsPage() {
     <div className="min-h-screen bg-black text-white">
       <Navigation />
       <main className="pt-24 pb-16 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto">
-        <h1 className="text-5xl font-bold text-white mb-8">Research</h1>
+        <h1 className="text-5xl font-bold text-white mb-8">Publications</h1>
 
         {/* Category Tabs */}
         <div className="flex gap-8 mb-8 pb-4">
           {["All", "Research", "Blog", "Announcements"].map((category) => (
-            <button
+            <Link
               key={category}
-              onClick={() => setActiveCategory(category.toLowerCase())}
-              className={`text-lg font-medium bg-transparent border-none outline-none focus:outline-none transition-colors duration-200
+              href={`/publications?category=${category.toLowerCase()}`}
+              onClick={e => {
+                e.preventDefault();
+                setActiveCategory(category.toLowerCase());
+              }}
+              className={`text-lg font-medium bg-transparent border-none outline-none focus:outline-none transition-colors duration-200 no-underline hover:no-underline focus:no-underline
                 ${activeCategory === category.toLowerCase() ? "border-b-2 border-white text-white" : "text-gray-400 hover:text-white"}
                 px-0 pb-2`}
-              style={{ fontFamily: 'var(--font-sf-pro)' }}
+              style={{ fontFamily: 'var(--font-sf-pro)', textDecoration: 'none' }}
             >
               {category}
-            </button>
+            </Link>
           ))}
         </div>
 
@@ -128,18 +132,20 @@ export default function PublicationsPage() {
 
         {/* Publications Grid */}
         <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12" : "flex flex-col gap-8"}>
-          {sortedAndFilteredPublications.map((publication) => (
+          {sortedAndFilteredPublications.map((publication, idx) => (
             viewMode === "grid" ? (
-              <Link key={publication.id} href={`/publications/${publication.id}`} className="block group">
-                <img src={publication.image} alt={publication.title} className="w-full h-auto rounded-lg mb-4 group-hover:opacity-80 transition" />
-                <div className="text-2xl font-semibold text-foreground mb-2 group-hover:underline" style={{ fontFamily: 'var(--font-sf-pro)' }}>{publication.title}</div>
+              <Link key={publication.id} href={`/publications/${publication.id}`} className="block group no-underline hover:no-underline focus:no-underline" style={{ textDecoration: 'none' }}>
+                <div className="aspect-square w-full relative overflow-hidden bg-black flex items-center justify-center">
+                  <img src={publication.image} alt={publication.title} className="object-cover w-full h-full rounded-lg" />
+                </div>
+                <div className="text-2xl font-semibold text-foreground mb-2" style={{ fontFamily: 'var(--font-sf-pro)' }}>{publication.title}</div>
                 <div className="text-base text-muted-foreground mb-4">{publication.type} {publication.date}</div>
               </Link>
             ) : (
-              <Link key={publication.id} href={`/publications/${publication.id}`} className="flex items-center gap-6 group">
-                <img src={publication.image} alt={publication.title} className="w-32 h-32 object-cover rounded-lg flex-shrink-0 group-hover:opacity-80 transition" />
+              <Link key={publication.id} href={`/publications/${publication.id}`} className="flex items-center gap-6 group no-underline hover:no-underline focus:no-underline" style={{ textDecoration: 'none' }}>
+                <img src={publication.image} alt={publication.title} className="w-32 h-32 object-cover rounded-lg flex-shrink-0" />
                 <div>
-                  <div className="text-xl font-semibold text-foreground mb-1 group-hover:underline" style={{ fontFamily: 'var(--font-sf-pro)' }}>{publication.title}</div>
+                  <div className="text-xl font-semibold text-foreground mb-1" style={{ fontFamily: 'var(--font-sf-pro)' }}>{publication.title}</div>
                   <div className="text-base text-muted-foreground">{publication.type} {publication.date}</div>
                 </div>
               </Link>

@@ -37,6 +37,9 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Stage, Environment } from '@react-three/drei';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 // Dynamically import the scroll section component to avoid SSR issues
 const IdeasScrollNodesSection = dynamic(() => import('./IdeasScrollNodesSection'), {
@@ -49,8 +52,28 @@ const IdeasScrollNodesSection = dynamic(() => import('./IdeasScrollNodesSection'
 });
 
 export default function EurusStudioPage() {
+  const toolImages = [
+    { label: 'Original', image: '/images/main.png' },
+    { label: 'Remove Background', image: '/images/main.nobackground.png' },
+    { label: 'Crop', image: '/images/main.png' },
+    { label: 'LUT', image: '/images/main.blackandwhite.png' },
+    { label: 'Invert', image: '/images/main.invert.png' },
+    { label: '3D', image: '/images/main.3B.glb', is3D: true },
+    { label: 'Level RGB', image: '/images/main.level.png' },
+  ];
+  const [currentImageIdx, setCurrentImageIdx] = useState(0);
+  const [activeImage, setActiveImage] = useState('/images/main.png');
+  const [imageLoaded, setImageLoaded] = useState(true);
+  const [hovered, setHovered] = useState(false);
+  function handleNextImage() {
+    const nextIdx = (currentImageIdx + 1) % toolImages.length;
+    setCurrentImageIdx(nextIdx);
+    setActiveImage(toolImages[nextIdx].image);
+    setImageLoaded(false);
+  }
+
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col font-sf-pro">
+    <div className="min-h-screen bg-black text-white flex flex-col font-sf-pro" style={{ borderBottomLeftRadius: '2.5rem', borderBottomRightRadius: '2.5rem', overflow: 'hidden' }}>
       <Navigation />
       <main className="flex-1 w-full pt-0 pb-0 px-0">
         {/* Hero Section: Artistic Intelligence */}
@@ -58,15 +81,21 @@ export default function EurusStudioPage() {
           {/* Infinite canvas background using <canvas> */}
           <InfiniteCanvasBackground />
           {/* Draggable nodes layer */}
-          <DraggableNodesLayer />
+          <DraggableNodesLayer onNodeAction={(action) => {
+            if (action === 'remove-background') setActiveImage('/images/main.nobackground.png');
+            else if (action === 'invert') setActiveImage('/images/main.invert.png');
+            else if (action === '3d') setIs3D(true);
+            else if (action === 'level-rgb') setActiveImage('/images/main.level.png');
+            else setActiveImage('/images/main.png');
+          }} />
           {/* Top-centered heading and subtitle */}
           <div className="relative z-10 flex flex-col items-center justify-start w-full pt-8">
             <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-4 text-center text-black dark:text-white" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-              Create Without Limits
+              Irreplacably Creative
             </h1>
             <p className="text-base md:text-lg font-light max-w-6xl mb-8 text-center text-black dark:text-white" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-              All your favorite AI models. One seamless workspace.<br />
-              Design, edit, and build with cinematic precision. Eurus brings together the best AI tools into a single node-based system—fluid, fast, and built for creators who demand more.
+              All your favorite AI models. All your favorite tools. One seamless canvas.<br />
+              Design, edit, and build with cinematic precision
             </p>
           </div>
         </section>
@@ -77,46 +106,93 @@ export default function EurusStudioPage() {
         </section>
 
         {/* Section: With all the professional tools you rely on */}
-        <section className="w-screen min-h-[50vh] py-20 flex flex-col items-center justify-center bg-black">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center text-white" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-            All the Tools You Trust. Now in One Flow.
-          </h2>
-          <p className="text-lg md:text-xl font-light mb-8 text-center text-white" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-            From cropping to relighting, every pro feature you need—streamlined in a single creative pipeline.
-          </p>
+        <section className="w-full min-h-[60vh] py-20 flex flex-col items-center justify-start bg-black font-sf-pro" style={{ fontFamily: 'Inter, SF Pro, sans-serif' }}>
+          <div className="w-full max-w-6xl flex flex-col md:flex-row items-center md:items-end justify-between mb-8 px-4">
+            <div>
+              <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-2 leading-tight" style={{ letterSpacing: '-0.01em' }}>
+                All the tools you trust. Now in one flow.
+              </h2>
+              <p className="text-lg md:text-xl font-light text-white/80 mb-0">
+                From cropping to relighting—designed for flow.
+              </p>
+            </div>
+          </div>
+          {/* Main Image with hover button */}
           <div className="w-full flex flex-col items-center justify-center">
-            <span className="text-base md:text-lg font-medium text-center text-white" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-              Includes: Invert · Outpaint · Crop · Inpaint · Mask Extractor · Upscale · Z-Depth · Image Describer · Channels · Painter · Relight
-            </span>
+            <div
+              className="relative w-[900px] h-[540px] flex items-center justify-center overflow-hidden rounded-2xl shadow-2xl border border-white/10 bg-black group"
+              onMouseEnter={() => setHovered(true)}
+              onMouseLeave={() => setHovered(false)}
+            >
+              {toolImages[currentImageIdx].is3D ? (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Canvas camera={{ position: [0, 0, 2.5] }} className="w-full h-full rounded-2xl" style={{ background: '#111' }}>
+                    <ambientLight intensity={1.2} />
+                    <directionalLight position={[2, 4, 2]} intensity={1.5} castShadow />
+                    <Environment preset="city" />
+                    <Stage environment={null} intensity={0.8}>
+                      <Model3D url={activeImage} />
+                    </Stage>
+                    <OrbitControls enablePan={false} />
+                  </Canvas>
+                  {/* Optionally, you can add a loading overlay for 3D here if needed */}
+                </div>
+              ) : toolImages[currentImageIdx].label === 'Crop' ? (
+                <div className="w-full h-full flex items-center justify-center">
+                  <img
+                    key={activeImage}
+                    src={activeImage}
+                    alt={toolImages[currentImageIdx].label}
+                    className="object-cover rounded-2xl transition-opacity duration-500"
+                    style={{ width: '340px', height: '340px', opacity: imageLoaded ? 1 : 0, transition: 'opacity 0.5s' }}
+                    onLoad={() => setImageLoaded(true)}
+                    onError={() => setImageLoaded(true)}
+                  />
+                </div>
+              ) : (
+                <img
+                  key={activeImage}
+                  src={activeImage}
+                  alt={toolImages[currentImageIdx].label}
+                  className="w-full h-full object-cover rounded-2xl transition-opacity duration-500"
+                  style={{ opacity: imageLoaded ? 1 : 0, transition: 'opacity 0.5s' }}
+                  onLoad={() => setImageLoaded(true)}
+                  onError={() => setImageLoaded(true)}
+                />
+              )}
+              {/* Hover overlay with all tool buttons, top-left aligned */}
+              <div
+                className={`absolute top-0 left-0 w-full h-full flex items-start justify-start transition-opacity duration-300 ${hovered ? 'opacity-100' : 'opacity-0'} focus:opacity-100`}
+                style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.22) 60%, rgba(0,0,0,0.08) 100%)', pointerEvents: hovered ? 'auto' : 'none' }}
+              >
+                <div className="mt-8 ml-8 flex flex-wrap gap-3 justify-start items-center">
+                  {toolImages.map((tool, idx) => (
+                    <button
+                      key={tool.label}
+                      onClick={() => {
+                        setCurrentImageIdx(idx);
+                        setActiveImage(tool.image);
+                        setImageLoaded(false);
+                      }}
+                      className={`px-6 py-2 rounded-full border border-neutral-700 font-medium text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 hover:shadow-lg hover:border-white/40 ${currentImageIdx === idx ? 'bg-white/90 text-black border-white/80 shadow-lg' : 'bg-black/40 text-white/90'}`}
+                      style={{ fontFamily: 'Inter, SF Pro, sans-serif', boxShadow: currentImageIdx === idx ? '0 0 16px 2px #fff2' : undefined }}
+                    >
+                      {tool.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {!imageLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center text-white/60 bg-black/60 rounded-2xl">
+                  Loading…
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
         {/* Section: Control the Outcome */}
-        <section className="w-screen min-h-[60vh] pt-20 pb-0 flex flex-col items-center justify-center bg-black" style={{ marginBottom: 0, paddingBottom: 0 }}>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center text-white" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-            Precision, Composed.
-          </h2>
-          <p className="text-lg md:text-xl font-light mb-8 text-center max-w-2xl text-white" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-            Master layers, text, and blending with absolute control.<br />
-            Your ideas, rendered exactly as imagined.
-          </p>
-          <div className="relative w-full max-w-3xl h-80 flex items-center justify-center mb-6">
-            {/* Placeholder for layered composition visual */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              {/* Stack of semi-transparent cards */}
-              <div className="absolute left-8 top-8 w-56 h-32 bg-gray-800 rounded-xl shadow-lg opacity-70" />
-              <div className="absolute left-16 top-16 w-56 h-32 bg-gray-700 rounded-xl shadow-lg opacity-80" />
-              <div className="absolute left-24 top-24 w-56 h-32 bg-gray-600 rounded-xl shadow-lg opacity-90" />
-              <div className="relative w-56 h-32 bg-gray-900 rounded-xl shadow-xl border-2 border-white flex items-center justify-center text-lg font-bold text-white" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-                {/* TODO: Replace with animated stack or Lottie */}
-                Layered Visual Placeholder
-              </div>
-            </div>
-          </div>
-          <p className="text-base font-light text-center text-white" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-            Maximize your team ability, by automatically generating a simplified UI
-          </p>
-        </section>
+        {/* Layered Visual Placeholder: Placeholder for multiple layered images */}
         <IdeasScrollNodesSection />
       </main>
     </div>
@@ -319,6 +395,12 @@ function ProductsScrollSectionStudio() {
           </span>
         ))}
       </div>
+      {/* Center bottom text */}
+      <div className="absolute left-1/2 bottom-10 -translate-x-1/2 z-30 pointer-events-none">
+        <span className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg bg-black/40 px-6 py-2 rounded-full" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+          30+ models in one canvas
+        </span>
+      </div>
     </div>
   );
 }
@@ -351,14 +433,17 @@ function InfiniteCanvasBackground() {
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-0" style={{ pointerEvents: 'none' }} />;
 }
 
-function DraggableNodesLayer() {
+function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) => void }) {
   // Node definitions
+  // Evenly spaced around a rectangle under the title, no overlaps
+  // Rectangle: top-left (x1, y1), bottom-right (x2, y2)
+  const x1 = 200, y1 = 320, x2 = 1000, y2 = 700;
   const initialNodes = [
-    { id: 1, x: 120, y: 220, w: 110, h: 110, type: 'image', label: '3D' }, // small square
-    { id: 2, x: 120, y: 370, w: 260, h: 90, type: 'lut', label: 'LUT' }, // wide rectangle, now LUT
-    { id: 3, x: 420, y: 220, w: 220, h: 300, type: 'image', label: 'Image' }, // large portrait
-    { id: 4, x: 700, y: 220, w: 300, h: 180, type: 'video', label: 'Video' }, // large landscape
-    { id: 5, x: 340, y: 320, w: 200, h: 60, type: 'text', label: 'Text' }, // moved further down
+    { id: 1, x: x1, y: y1, w: 300, h: 180, type: '3dimage', label: '3D' }, // top-left, now same size as Video node
+    { id: 5, x: (x1 + x2) / 2 - 100, y: y1 - 80, w: 200, h: 60, type: 'text', label: 'Text' }, // top-center
+    { id: 4, x: x2 - 250, y: y1, w: 300, h: 180, type: 'video', label: 'Video' }, // top-right, moved further right
+    { id: 2, x: x1 + 30, y: y2 - 90, w: 260, h: 90, type: 'lut', label: 'LUT' }, // bottom-left
+    { id: 3, x: x2 - 500, y: y2 - 300, w: 220, h: 300, type: 'image', label: 'Image' }, // bottom-right, moved further left
   ];
   const [nodes, setNodes] = React.useState(initialNodes);
   const [draggingId, setDraggingId] = React.useState<number | null>(null);
@@ -502,6 +587,14 @@ function DraggableNodesLayer() {
           className={`absolute flex flex-col items-center ${draggingId === node.id ? 'z-50' : 'z-20'}`}
           style={{ left: node.x, top: node.y, width: node.w, height: node.h, pointerEvents: 'auto', userSelect: 'none' }}
           onMouseDown={e => onMouseDown(e, node.id)}
+          onClick={() => {
+            // Only trigger for specific node labels
+            if (node.label === '3D') onNodeAction('3d');
+            else if (node.label === 'Image') onNodeAction('remove-background');
+            else if (node.label === 'LUT') onNodeAction('level-rgb');
+            else if (node.label === 'Video') onNodeAction('invert');
+            // Add more mappings as needed
+          }}
         >
           {/* Label above node */}
           <span className="mb-1 text-xs font-semibold text-white dark:text-white bg-black/60 dark:bg-black/80 px-2 py-0.5 rounded select-none" style={{ marginBottom: 2 }}>{node.label}</span>
@@ -510,6 +603,9 @@ function DraggableNodesLayer() {
             className={`w-full h-full bg-white/80 dark:bg-black/80 border border-gray-300 dark:border-gray-700 shadow-md flex items-center justify-center select-none cursor-move relative ${node.type === 'video' ? 'rounded-lg' : 'rounded-xl'}${draggingId === node.id ? ' shadow-2xl scale-105' : ''}`}
             style={{ pointerEvents: 'auto', transition: draggingId === node.id ? 'none' : 'transform 0.2s ease-out, box-shadow 0.2s ease-out' }}
           >
+            {node.type === '3dimage' && (
+              <InteractiveTiltImage src="/images/Subject.png" alt="3D Subject" />
+            )}
             {node.type === 'image' && (
               <img src="https://eurusworkflows.blob.core.windows.net/eurusworkflows/Gemini_Generated_Image_gyykvsgyykvsgyyk.png" alt="img" className="w-full h-full object-cover rounded-xl" />
             )}
@@ -534,6 +630,108 @@ function DraggableNodesLayer() {
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+// 3D Model loader component
+function Model3D({ url }: { url: string }) {
+  const [gltf, setGltf] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const ref = useRef<any>(null);
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    const loader = new GLTFLoader();
+    loader.load(
+      url,
+      (gltf: any) => {
+        setGltf(gltf);
+        setLoading(false);
+      },
+      undefined,
+      (err) => {
+        setError('Failed to load 3D model');
+        setLoading(false);
+      }
+    );
+  }, [url]);
+  if (loading || error) return null;
+  return gltf ? <primitive object={gltf.scene} ref={ref} scale={1.2} /> : null;
+}
+
+// Overlay for loading/error
+function Model3DOverlay({ url }: { url: string }) {
+  const [gltf, setGltf] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    const loader = new GLTFLoader();
+    loader.load(
+      url,
+      (gltf: any) => {
+        setGltf(gltf);
+        setLoading(false);
+      },
+      undefined,
+      (err) => {
+        setError('Failed to load 3D model');
+        setLoading(false);
+      }
+    );
+  }, [url]);
+  if (!loading && !error) return null;
+  return (
+    <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
+      {loading && <div className="text-white bg-black/80 px-4 py-2 rounded-2xl">Loading 3D…</div>}
+      {error && <div className="text-red-400 bg-black/80 px-4 py-2 rounded-2xl">{error}</div>}
+    </div>
+  );
+}
+
+function InteractiveTiltImage({ src, alt }: { src: string, alt: string }) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = React.useState({ x: 0, y: 0 });
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+    // Map x/y to full 360deg rotation
+    setTilt({ x: x * 180, y: y * 180 });
+  }
+  function handleMouseLeave() {
+    setTilt({ x: 0, y: 0 });
+  }
+  return (
+    <div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        width: '100%',
+        height: '100%',
+        perspective: 600,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <img
+        src={src}
+        alt={alt}
+        style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: '1rem',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+          transform: `rotateY(${tilt.x}deg) rotateX(${-tilt.y}deg)`,
+          transition: 'transform 0.2s cubic-bezier(.25,.8,.25,1)',
+        }}
+      />
     </div>
   );
 } 

@@ -382,12 +382,12 @@ function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-5xl mx-auto w-full">
               {/* Use original titles/types/dates/links, but swap images */}
               {publicationsData.slice(0, 4).map((pub, idx) => (
-                <div key={pub.id} className="flex flex-col items-center">
+                <Link key={pub.id} href={pub.readPaperLink || `/publications/${pub.id}`} className="flex flex-col items-center group no-underline hover:no-underline focus:no-underline" style={{ textDecoration: 'none' }}>
                   <img src={`/images/${idx + 1}.jpg`} alt={pub.title} className="w-full aspect-square object-cover rounded-lg mb-4" />
                   <div className="text-lg font-semibold text-foreground mb-1 text-center" style={{ fontFamily: 'var(--font-sf-pro)' }}>{pub.title}</div>
                   <div className="text-sm text-muted-foreground text-center">{pub.type} {pub.date}</div>
-                  <a href={pub.readPaperLink || '#'} className="text-primary font-semibold flex items-center gap-2 hover:underline mt-2">Read More</a>
-                </div>
+                  <span className="text-primary font-semibold flex items-center gap-2 mt-2">Read More</span>
+                </Link>
               ))}
             </div>
           </section>
@@ -511,8 +511,8 @@ function ProductsScrollSectionLanding() {
 // Add this new component for the landing page
 function ProductsScrollSectionStudioLanding() {
   const products = [
-    { name: 'Eidos', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract4.mp4', description: 'Eidos is the world-leading generative AI for text, code, and more.', link: '/eidos' },
-    { name: 'Relay', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract1.mp4', description: 'Relay brings next-gen video and image generation to creators.', link: '/relay' },
+    { name: 'Eidos', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract4.mp4', description: 'Eidos is the world-leading generative AI for text, code, and more.', link: 'https://eidos.press/' },
+    { name: 'Relay', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract1.mp4', description: 'Relay brings next-gen video and image generation to creators.', link: 'https://www.relayedstories.com/' },
     { name: 'Studio', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract3.mp4', description: 'Studio is a powerful AI for video understanding and creative editing.', link: '/studio' },
     { name: 'Draft', videoSrc: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract2.mp4', description: 'Draft enables advanced audio and speech synthesis for your projects.', link: '/draft' },
   ];
@@ -617,10 +617,7 @@ function ProductsScrollSectionStudioLanding() {
       className="w-full h-screen relative overflow-hidden"
       onWheel={handleWheel}
     >
-      {/* Explore Overlay */}
-      <div className="absolute left-8 top-8 z-30 flex flex-col items-start">
-        <ExploreMenu />
-      </div>
+      {/* Video backgrounds for each product */}
       {products.map((product, idx) => (
         <video
           key={product.name}
@@ -634,41 +631,31 @@ function ProductsScrollSectionStudioLanding() {
         />
       ))}
       <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
-      <div className="absolute left-10 top-1/2 -translate-y-1/2 z-20" style={{ pointerEvents: 'none' }}>
-      </div>
       <div className="absolute right-10 top-1/2 -translate-y-1/2 flex flex-col items-end gap-2 z-20 pointer-events-none">
         {products.map((p, i) => (
-          <a
-            key={p.name}
-            href={p.link}
-            className={`text-5xl md:text-7xl font-bold transition-all duration-300 text-right no-underline ${current === i ? 'text-yellow-200' : 'text-white/80'}`}
-            style={{ fontFamily: 'var(--font-sf-pro)', opacity: current === i ? 1 : 0.7, pointerEvents: 'auto', textDecoration: 'none' }}
-          >
-            {p.name}
-          </a>
+          p.link.startsWith('http') ? (
+            <a
+              key={p.name}
+              href={p.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`text-5xl md:text-7xl font-bold transition-all duration-300 text-right no-underline ${current === i ? 'text-yellow-200' : 'text-white/80'}`}
+              style={{ fontFamily: 'var(--font-sf-pro)', opacity: current === i ? 1 : 0.7, pointerEvents: 'auto', textDecoration: 'none' }}
+            >
+              {p.name}
+            </a>
+          ) : (
+            <a
+              key={p.name}
+              href={p.link}
+              className={`text-5xl md:text-7xl font-bold transition-all duration-300 text-right no-underline ${current === i ? 'text-yellow-200' : 'text-white/80'}`}
+              style={{ fontFamily: 'var(--font-sf-pro)', opacity: current === i ? 1 : 0.7, pointerEvents: 'auto', textDecoration: 'none' }}
+            >
+              {p.name}
+            </a>
+          )
         ))}
       </div>
-    </div>
-  );
-}
-
-// Add this above the HomePage or ProductsScrollSectionStudioLanding function
-function ExploreMenu() {
-  const [open, setOpen] = React.useState(false);
-  return (
-    <div className="relative">
-      <button
-        className="text-3xl font-bold text-white p-0 m-0"
-        style={{ background: 'none', boxShadow: 'none', border: 'none', minWidth: 0, textTransform: 'none', letterSpacing: 0 }}
-        onClick={() => setOpen((v) => !v)}
-      >
-        Out now
-      </button>
-      {open && (
-        <div className="absolute left-0 mt-2 w-48 rounded shadow-lg bg-gray-700 text-white z-50 border border-gray-500">
-          <div className="px-4 py-3">This is a grey menu bar.</div>
-        </div>
-      )}
     </div>
   );
 }
