@@ -92,7 +92,7 @@ export default function EurusStudioPage() {
         </section>
 
         {/* Section: Control the Outcome */}
-        <section className="w-screen min-h-[60vh] py-20 flex flex-col items-center justify-center bg-black">
+        <section className="w-screen min-h-[60vh] pt-20 pb-0 flex flex-col items-center justify-center bg-black" style={{ marginBottom: 0, paddingBottom: 0 }}>
           <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center text-white" style={{ fontFamily: 'var(--font-sf-pro)' }}>
             Precision, Composed.
           </h2>
@@ -117,9 +117,6 @@ export default function EurusStudioPage() {
             Maximize your team ability, by automatically generating a simplified UI
           </p>
         </section>
-
-
-
         <IdeasScrollNodesSection />
       </main>
     </div>
