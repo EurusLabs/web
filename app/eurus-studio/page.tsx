@@ -935,6 +935,14 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
   const liveNodes = React.useRef(nodes);
   React.useEffect(() => { liveNodes.current = nodes; }, [nodes]);
 
+  // Update nodes when component mounts
+  React.useEffect(() => {
+    if (isMounted) {
+      const { nodes: newNodes } = getResponsiveLayout();
+      setNodes(newNodes);
+    }
+  }, [isMounted]);
+
   // Update layout on window resize
   React.useEffect(() => {
     const handleResize = () => {
