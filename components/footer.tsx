@@ -32,41 +32,41 @@ export default function Footer() {
       />
       {/* Overlay for readability */}
       <div className="absolute inset-0 bg-black/70 z-10" style={{ borderTopLeftRadius: '2.5rem', borderTopRightRadius: '2.5rem' }} />
-      {/* Footer content */}
-      <div className="relative z-20 w-full max-w-7xl mx-auto px-8 py-6 flex flex-col gap-4">
+      {/* Footer content - Mobile Responsive */}
+      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 flex flex-col gap-3 sm:gap-4">
         {/* Documents row - top right */}
         <div className="flex flex-row w-full justify-end items-start">
-          <a href="https://eurus-labs.gitbook.io/eurus-labs/getting-started/quickstart" target="_blank" rel="noopener noreferrer" className="font-semibold text-base opacity-80 hover:opacity-100 hover:underline">Documents</a>
+          <a href="https://eurus-labs.gitbook.io/eurus-labs/getting-started/quickstart" target="_blank" rel="noopener noreferrer" className="font-semibold text-sm sm:text-base opacity-80 hover:opacity-100 hover:underline">Documents</a>
         </div>
-        {/* Verticals - left aligned */}
-        <div className="flex flex-row items-start gap-12 text-left">
+        {/* Verticals - Mobile: Stack vertically, Desktop: Horizontal */}
+        <div className="flex flex-col sm:flex-row items-start gap-6 sm:gap-8 md:gap-12 text-left">
           {/* Products vertical */}
-          <div className="flex flex-col items-start gap-2">
-            <div className="font-bold text-lg">PRODUCTS</div>
-            <a href="https://kind-mud-06307e40f.2.azurestaticapps.net" target="_blank" rel="noopener noreferrer" className="hover:underline">Studio</a>
-            <a href="https://red-forest-0721f660f.6.azurestaticapps.net/" target="_blank" rel="noopener noreferrer" className="hover:underline">Draft</a>
-            <a href="https://www.relayedstories.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">Relay</a>
-            <a href="https://eidos.press/" target="_blank" rel="noopener noreferrer" className="hover:underline">Eidos</a>
+          <div className="flex flex-col items-start gap-1 sm:gap-2">
+            <div className="font-bold text-base sm:text-lg">PRODUCTS</div>
+            <a href="https://kind-mud-06307e40f.2.azurestaticapps.net" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Studio</a>
+            <a href="https://red-forest-0721f660f.6.azurestaticapps.net/" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Draft</a>
+            <a href="https://www.relayedstories.com/" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Relay</a>
+            <a href="https://eidos.press/" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Eidos</a>
           </div>
           {/* Company vertical */}
-          <div className="flex flex-col items-start gap-2">
-            <div className="font-bold text-lg">COMPANY</div>
-            <a href="https://eurus-labs.gitbook.io/eurus-labs/getting-started/quickstart" target="_blank" rel="noopener noreferrer" className="hover:underline">About</a>
-            <a href="/careers" className="hover:underline">Careers</a>
-            <a href="/contact" className="hover:underline">Contact</a>
+          <div className="flex flex-col items-start gap-1 sm:gap-2">
+            <div className="font-bold text-base sm:text-lg">COMPANY</div>
+            <a href="https://eurus-labs.gitbook.io/eurus-labs/getting-started/quickstart" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">About</a>
+            <a href="/careers" className="text-sm sm:text-base hover:underline">Careers</a>
+            <a href="/contact" className="text-sm sm:text-base hover:underline">Contact</a>
           </div>
           {/* Social vertical */}
-          <div className="flex flex-col items-start gap-2">
-            <div className="font-bold text-lg">SOCIAL</div>
-            <a href="https://x.com/eurus_labs" target="_blank" rel="noopener noreferrer" className="hover:underline">X</a>
-            <a href="https://www.linkedin.com/company/euruslabs/" target="_blank" rel="noopener noreferrer" className="hover:underline">LinkedIn</a>
-            <a href="https://www.instagram.com/euruslabs/" target="_blank" rel="noopener noreferrer" className="hover:underline">Instagram</a>
-            <a href="https://discord.gg/Y4PEMhas" target="_blank" rel="noopener noreferrer" className="hover:underline">Discord</a>
+          <div className="flex flex-col items-start gap-1 sm:gap-2">
+            <div className="font-bold text-base sm:text-lg">SOCIAL</div>
+            <a href="https://x.com/eurus_labs" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">X</a>
+            <a href="https://www.linkedin.com/company/euruslabs/" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">LinkedIn</a>
+            <a href="https://www.instagram.com/euruslabs/" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Instagram</a>
+            <a href="https://discord.gg/Y4PEMhas" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Discord</a>
           </div>
         </div>
         {/* Copyright - bottom right */}
-        <div className="flex flex-row w-full justify-end items-end mt-2">
-          <span className="text-sm opacity-60">Eurus Labs 2025 © </span>
+        <div className="flex flex-row w-full justify-end items-end mt-1 sm:mt-2">
+          <span className="text-xs sm:text-sm opacity-60">Eurus Labs 2025 © </span>
         </div>
       </div>
     </footer>
