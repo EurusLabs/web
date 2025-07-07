@@ -74,10 +74,6 @@ export default function EurusStudioPage() {
     setImageLoaded(false);
   }
 
-
-
-
-
   return (
     <div className="min-h-screen bg-black text-white flex flex-col font-sf-pro" style={{ borderBottomLeftRadius: '2.5rem', borderBottomRightRadius: '2.5rem', overflow: 'hidden' }}>
       <Navigation />
