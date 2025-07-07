@@ -798,6 +798,14 @@ function ProductsScrollSectionStudioLanding() {
         />
       ))}
       <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
+      
+      {/* Left side heading */}
+      <div className="absolute left-4 sm:left-6 md:left-8 lg:left-10 top-1/2 -translate-y-1/2 z-20 max-w-[60%] sm:max-w-none pointer-events-none">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white drop-shadow-lg leading-tight" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+          Build with the<br />Eurus Ecosystem.
+        </h2>
+      </div>
+      
       <div className="absolute right-10 top-1/2 -translate-y-1/2 flex flex-col items-end gap-2 z-20 pointer-events-none">
         {products.map((p, i) =>
           p.link.startsWith("http") ? (

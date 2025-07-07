@@ -537,28 +537,34 @@ function ProductsScrollSectionStudio() {
 function ProductsScrollSectionStudioLanding() {
   const products = [
     {
-      name: "Eidos",
-      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract4.mp4",
-      description: "Eidos is the world-leading generative AI for text, code, and more.",
-      link: "https://eidos.press/",
+      name: "Eleven Labs",
+      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person1.mp4",
+      description: "Eleven Labs is the world-leading generative AI for voice synthesis and audio.",
+      link: "https://elevenlabs.io/",
     },
     {
-      name: "Relay",
-      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract1.mp4",
-      description: "Relay brings next-gen video and image generation to creators.",
-      link: "https://www.relayedstories.com/",
+      name: "Rodin",
+      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person2.mp4",
+      description: "Rodin brings next-gen 3D generation and modeling to creators.",
+      link: "https://rodin.ai/",
     },
     {
-      name: "Studio",
-      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract3.mp4",
-      description: "Studio is a powerful AI for video understanding and creative editing.",
-      link: "https://kind-mud-06307e40f.2.azurestaticapps.net",
+      name: "Veo 3",
+      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person3.mp4",
+      description: "Veo 3 is a powerful AI for video understanding and creative editing.",
+      link: "https://deepmind.google/technologies/veo/",
     },
     {
-      name: "Draft",
-      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract2.mp4",
-      description: "Draft enables advanced audio and speech synthesis for your projects.",
-      link: "https://red-forest-0721f660f.6.azurestaticapps.net/",
+      name: "Kling",
+      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person4.mp4",
+      description: "Kling enables advanced audio and speech synthesis for your projects.",
+      link: "https://kling.kuaishou.com/",
+    },
+    {
+      name: "Luma ray 2",
+      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person5.mp4",
+      description: "Luma ray 2 delivers photorealistic 3D and lighting effects with AI.",
+      link: "https://lumalabs.ai/",
     },
   ]
 
@@ -627,7 +633,7 @@ function ProductsScrollSectionStudioLanding() {
 
       // Handle boundary conditions
       if (newIndex < 0) {
-        // Scroll up from Eidos: allow page scroll to previous section
+        // Scroll up from first product: allow page scroll to previous section
         isReleasingScrollRef.current = true
         setIsFullyVisible(false)
         document.body.style.overflow = ""
@@ -639,7 +645,7 @@ function ProductsScrollSectionStudioLanding() {
       }
 
       if (newIndex >= products.length) {
-        // Scroll down from Draft: allow page scroll to next section
+        // Scroll down from last product: allow page scroll to next section
         isReleasingScrollRef.current = true
         setIsFullyVisible(false)
         document.body.style.overflow = ""
@@ -680,7 +686,7 @@ function ProductsScrollSectionStudioLanding() {
         const intersectionRatio = entry.intersectionRatio
         const isIntersecting = entry.isIntersecting
 
-        // Reset to Eidos when section first becomes visible
+        // Reset to first product when section first becomes visible
         if (isIntersecting && intersectionRatio > 0.1 && !isFullyVisible) {
           setCurrent(0)
           setHasStartedScrolling(false)
@@ -700,7 +706,7 @@ function ProductsScrollSectionStudioLanding() {
             block: "start",
           })
 
-          // Always start with Eidos when coming from above (tools section)
+          // Always start with first product when coming from above (tools section)
           setCurrent(0)
           setHasStartedScrolling(false)
           return
@@ -713,7 +719,7 @@ function ProductsScrollSectionStudioLanding() {
           !isReleasingScrollRef.current
         ) {
           setIsFullyVisible(true)
-          // ALWAYS ensure we start with Eidos when becoming fully visible from any direction
+          // ALWAYS ensure we start with first product when becoming fully visible from any direction
           setCurrent(0)
           setHasStartedScrolling(false)
         } else if (intersectionRatio < 0.3 && isFullyVisible) {
@@ -788,12 +794,7 @@ function ProductsScrollSectionStudioLanding() {
       ))}
       <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
       
-      {/* Left side heading */}
-      <div className="absolute left-4 sm:left-6 md:left-8 lg:left-10 top-1/2 -translate-y-1/2 z-20 max-w-[60%] sm:max-w-none pointer-events-none">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white drop-shadow-lg leading-tight" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-          Build with the<br />Eurus Ecosystem.
-        </h2>
-      </div>
+
       
       {/* Right side product names */}
       <div className="absolute right-4 sm:right-6 md:right-8 lg:right-10 top-1/2 -translate-y-1/2 flex flex-col items-end gap-1 sm:gap-2 md:gap-3 z-20 pointer-events-none max-w-[35%] sm:max-w-none">
@@ -815,12 +816,7 @@ function ProductsScrollSectionStudioLanding() {
         ))}
       </div>
       
-      {/* Bottom center description */}
-      <div className="absolute left-1/2 bottom-6 sm:bottom-8 md:bottom-10 -translate-x-1/2 z-30 pointer-events-none">
-        <span className="text-base sm:text-lg md:text-xl font-medium text-white drop-shadow-lg px-4 text-center" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-          {products[current].description}
-        </span>
-      </div>
+
     </div>
   )
 }
