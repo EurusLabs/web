@@ -18,22 +18,30 @@ export default function IdeasScrollNodesSection() {
       
       // Calculate scroll progress through the section
       if (sectionTop < windowHeight && sectionBottom > 0) {
-        const scrolled = windowHeight - sectionTop;
-        const progress = Math.max(0, Math.min(1, scrolled / (sectionHeight + windowHeight)));
+        // Simple progress calculation
+        const progress = Math.max(0, Math.min(1, (windowHeight - sectionTop) / (sectionHeight + windowHeight)));
         setProgress(progress);
         
-        // Determine which section should be focused based on scroll progress
-        if (progress < 0.33) {
-          setFocusedSection(0); // Inspire
-        } else if (progress < 0.66) {
-          setFocusedSection(1); // Refine
-        } else {
-          setFocusedSection(2); // Craft
-        }
+                 // BALANCED approach: Ensure all three sections get proper highlighting
+         if (sectionTop > windowHeight * 0.1) {
+           // Section is just entering viewport - ALWAYS show Inspire
+           setFocusedSection(0);
+         } else {
+           // Section is well into viewport - balanced progress-based logic
+           if (progress < 0.45) {
+             setFocusedSection(0); // Inspire - good initial range
+           } else if (progress < 0.75) {
+             setFocusedSection(1); // Refine - middle range
+           } else {
+             setFocusedSection(2); // Craft - final range (lowered from 88% to 75%)
+           }
+         }
       } else if (sectionTop >= windowHeight) {
+        // Section is below viewport
         setProgress(0);
         setFocusedSection(0); // Default to Inspire
       } else if (sectionBottom <= 0) {
+        // Section is above viewport
         setProgress(1);
         setFocusedSection(2); // Default to Craft when fully scrolled
       }
@@ -72,23 +80,23 @@ export default function IdeasScrollNodesSection() {
     <section
       ref={sectionRef}
       className="w-screen bg-black flex flex-col items-center justify-center p-0 m-0"
-      style={{ minHeight: '100vh', padding: 0, margin: 0 }}
+      style={{ minHeight: '100vh', padding: '2rem 0', margin: 0 }}
     >
-      <h2 className="text-4xl md:text-5xl font-extrabold mb-8 mt-0 text-center text-white" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+      <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 sm:mb-8 mt-0 text-center text-white px-4" style={{ fontFamily: 'var(--font-sf-pro)' }}>
         Ideas don't wait. Neither should you.
       </h2>
-      <div className="relative w-full flex flex-row items-center justify-center gap-8 h-[60vh]">
+      <div className="relative w-full flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 md:gap-8 h-auto sm:h-[60vh] px-4 sm:px-6 md:px-8">
         {sections.map((section, idx) => (
           <div 
             key={section.id}
-            className="transition-all duration-700 ease-in-out flex flex-col items-center" 
+            className="transition-all duration-700 ease-in-out flex flex-col items-center mb-6 sm:mb-0" 
             style={{ 
               opacity: focusedSection === idx ? 1 : 0.4,
-              transform: focusedSection === idx ? 'scale(1.1)' : 'scale(0.9)',
+              transform: focusedSection === idx ? 'scale(1.05)' : 'scale(0.95)',
               filter: focusedSection === idx ? 'brightness(1.1)' : 'brightness(0.7)'
             }}
           >
-            <div className="w-80 h-80 flex items-center justify-center">
+            <div className="w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 flex items-center justify-center">
               {section.isVideo ? (
                 <video
                   src={section.image}
@@ -121,10 +129,10 @@ export default function IdeasScrollNodesSection() {
               )}
             </div>
             <span 
-              className="mt-4 text-lg font-semibold transition-all duration-500"
+              className="mt-3 sm:mt-4 text-base sm:text-lg md:text-xl font-semibold transition-all duration-500"
               style={{
                 color: focusedSection === idx ? '#fbbf24' : '#ffffff90',
-                fontSize: focusedSection === idx ? '1.25rem' : '1.125rem',
+                fontSize: focusedSection === idx ? 'clamp(1.1rem, 2.5vw, 1.25rem)' : 'clamp(1rem, 2vw, 1.125rem)',
                 fontWeight: focusedSection === idx ? '700' : '600'
               }}
             >

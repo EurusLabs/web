@@ -82,8 +82,8 @@ export default function EurusStudioPage() {
     <div className="min-h-screen bg-black text-white flex flex-col font-sf-pro" style={{ borderBottomLeftRadius: '2.5rem', borderBottomRightRadius: '2.5rem', overflow: 'hidden' }}>
       <Navigation />
       <main className="flex-1 w-full pt-0 pb-0 px-0">
-        {/* Hero Section: Artistic Intelligence */}
-        <section className="w-screen min-h-screen flex flex-col items-center justify-start pt-12 px-6 md:px-24 relative overflow-hidden" style={{ minHeight: '100vh' }}>
+        {/* Hero Section: Artistic Intelligence - Mobile Optimized */}
+        <section className="w-screen min-h-screen flex flex-col items-center justify-start pt-6 sm:pt-8 md:pt-12 px-4 sm:px-6 md:px-12 lg:px-24 relative overflow-hidden" style={{ minHeight: '100vh' }}>
           {/* Infinite canvas background using <canvas> */}
           <InfiniteCanvasBackground />
           {/* Draggable nodes layer */}
@@ -94,14 +94,14 @@ export default function EurusStudioPage() {
             else if (action === 'level-rgb') setActiveImage('/images/main.level.png');
             else setActiveImage('/images/main.png');
           }} />
-          {/* Top-centered heading and subtitle */}
-          <div className="relative z-10 flex flex-col items-center justify-start w-full pt-8">
-            <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-4 text-center text-black dark:text-white" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+          {/* Top-centered heading and subtitle - Mobile Responsive */}
+          <div className="relative z-10 flex flex-col items-center justify-start w-full pt-4 sm:pt-6 md:pt-8">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-tight mb-3 sm:mb-4 md:mb-6 text-center text-black dark:text-white px-2" style={{ fontFamily: 'var(--font-sf-pro)' }}>
               Irreplacably Creative
             </h1>
-            <p className="text-base md:text-lg font-light max-w-6xl mb-8 text-center text-black dark:text-white" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-              All your favorite AI models. All your favorite tools. One seamless canvas.<br />
-              Design, edit, and build with cinematic precision
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl font-light max-w-sm sm:max-w-2xl md:max-w-4xl lg:max-w-6xl mb-6 sm:mb-8 text-center text-black dark:text-white px-4" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+              All your favorite AI models. All your favorite tools. One seamless canvas.<br className="hidden sm:block" />
+              <span className="block sm:inline">Design, edit, and build with cinematic precision</span>
             </p>
           </div>
         </section>
@@ -165,7 +165,10 @@ export default function EurusStudioPage() {
                   >
                     <div className="w-full h-full">
                       <Canvas 
-                        camera={{ position: [0, 0, 3.2] }} 
+                        camera={{ 
+                          position: [0, 0, typeof window !== 'undefined' && window.innerWidth < 640 ? 3.2 : window.innerWidth < 768 ? 3.0 : 2.8],
+                          fov: typeof window !== 'undefined' && window.innerWidth < 640 ? 60 : 50
+                        }} 
                         className="w-full h-full" 
                         style={{ background: '#111' }}
                       >
@@ -231,24 +234,21 @@ export default function EurusStudioPage() {
                 )}
               </div>
               
-              {/* Title text overlay - CENTER TOP - Hidden for 3D */}
-              {!toolImages[currentImageIdx].is3D && (
-                <div className="absolute top-8 left-0 right-0 flex justify-center pointer-events-none z-50">
-                  <div className="text-center">
-                    <h2 className={`text-5xl md:text-7xl font-bold mb-2 leading-tight ${
-                      ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black'
-                    }`} style={{ letterSpacing: '-0.01em', fontFamily: 'var(--font-sf-pro)' }}>
-                      All the tools you trust.<br />Now in one flow.
-                    </h2>
-                    <p className={`text-base md:text-lg font-light ${
-                      ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white/90' : 'text-black/80'
-                    }`} style={{ fontFamily: 'var(--font-sf-pro)' }}>
-                      From cropping to relighting—designed for flow.
-                    </p>
-
-                  </div>
+              {/* Title text overlay - CENTER TOP */}
+              <div className="absolute top-8 left-0 right-0 flex justify-center pointer-events-none z-50">
+                <div className="text-center">
+                  <h2 className={`text-5xl md:text-7xl font-bold mb-2 leading-tight ${
+                    ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black'
+                  }`} style={{ letterSpacing: '-0.01em', fontFamily: 'var(--font-sf-pro)' }}>
+                    All the tools you trust.<br />Now in one flow.
+                  </h2>
+                  <p className={`text-base md:text-lg font-light ${
+                    ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white/90' : 'text-black/80'
+                  }`} style={{ fontFamily: 'var(--font-sf-pro)' }}>
+                    From cropping to relighting—designed for flow.
+                  </p>
                 </div>
-              )}
+              </div>
 
               {/* Current tool name overlay - BOTTOM CENTER */}
               <div className="absolute bottom-8 left-1/2 -translate-x-1/2 pointer-events-none z-50">
@@ -481,9 +481,9 @@ function ProductsScrollSectionStudio() {
       ))}
       {/* Overlay for better text visibility */}
       <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
-      {/* Overlayed static heading on top of image */}
+      {/* Overlayed static heading on top of image - Mobile Responsive */}
       <div 
-        className="absolute left-10 top-1/2 -translate-y-1/2 z-20" 
+        className="absolute left-4 sm:left-6 md:left-8 lg:left-10 top-1/2 -translate-y-1/2 z-20 max-w-[60%] sm:max-w-none" 
         style={{ 
           pointerEvents: 'none',
           transform: `translateY(-50%) translateX(${isLoaded ? '0' : '-100px'})`,
@@ -492,13 +492,13 @@ function ProductsScrollSectionStudio() {
           willChange: 'transform, opacity'
         }}
       >
-        <h2 className="text-4xl md:text-5xl font-extrabold text-white drop-shadow-lg" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white drop-shadow-lg leading-tight" style={{ fontFamily: 'var(--font-sf-pro)' }}>
           Every Model.<br />One Platform.
         </h2>
       </div>
-      {/* Overlayed product name list, always visible */}
+      {/* Overlayed product name list, always visible - Mobile Responsive */}
       <div 
-        className="absolute right-10 top-1/2 -translate-y-1/2 flex flex-col items-end gap-3 z-20 pointer-events-none"
+        className="absolute right-4 sm:right-6 md:right-8 lg:right-10 top-1/2 -translate-y-1/2 flex flex-col items-end gap-1 sm:gap-2 md:gap-3 z-20 pointer-events-none max-w-[35%] sm:max-w-none"
         style={{
           transform: `translateY(-50%) translateX(${isLoaded ? '0' : '100px'})`,
           opacity: isLoaded ? 1 : 0,
@@ -509,23 +509,24 @@ function ProductsScrollSectionStudio() {
         {products.map((p, i) => (
           <span
             key={p.name}
-            className={`text-5xl md:text-7xl font-bold text-right ${current === i ? 'text-yellow-200' : 'text-white/70'}`}
+            className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-right ${current === i ? 'text-yellow-200' : 'text-white/70'}`}
             style={{ 
               fontFamily: 'var(--font-sf-pro)', 
               opacity: current === i ? 1 : 0.6,
               transform: current === i ? 'scale(1.05)' : 'scale(1)',
               transition: 'all 800ms cubic-bezier(0.23, 1, 0.32, 1)',
               willChange: 'transform, opacity, color',
-              textShadow: current === i ? '0 4px 20px rgba(255, 235, 59, 0.3)' : '0 2px 10px rgba(0, 0, 0, 0.5)'
+              textShadow: current === i ? '0 4px 20px rgba(255, 235, 59, 0.3)' : '0 2px 10px rgba(0, 0, 0, 0.5)',
+              fontSize: 'clamp(1.2rem, 4vw, 4rem)'
             }}
           >
             {p.name}
           </span>
         ))}
       </div>
-      {/* Center bottom text */}
-      <div className="absolute left-1/2 bottom-10 -translate-x-1/2 z-30 pointer-events-none">
-        <span className="text-lg md:text-xl font-medium text-white drop-shadow-lg" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+      {/* Center bottom text - Mobile Responsive */}
+      <div className="absolute left-1/2 bottom-6 sm:bottom-8 md:bottom-10 -translate-x-1/2 z-30 pointer-events-none">
+        <span className="text-base sm:text-lg md:text-xl font-medium text-white drop-shadow-lg px-4 text-center" style={{ fontFamily: 'var(--font-sf-pro)' }}>
           30+ models in one canvas
         </span>
       </div>
@@ -563,30 +564,92 @@ function InfiniteCanvasBackground() {
 
 function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) => void }) {
   const smallOrbitControlsRef = useRef<any>(null);
-  // Node definitions
-  // Clean, sophisticated layout under the title with proper spacing
-  // Canvas area: starts below title (y=280) and spreads across viewport
-  const canvasWidth = 1200;
-  const canvasHeight = 500;
-  const startX = 100;
-  const startY = 280;
   
-  const initialNodes = [
-    // Top row - evenly spaced
-    { id: 5, x: startX, y: startY, w: 180, h: 80, type: 'text', label: 'Text' }, // far left
-    { id: 2, x: startX + 220, y: startY, w: 160, h: 80, type: 'lut', label: 'LUT' }, // left-center
-    { id: 3, x: startX + 420, y: startY, w: 180, h: 120, type: 'image', label: 'Image' }, // center
-    { id: 6, x: startX + 640, y: startY, w: 180, h: 120, type: 'image2', label: 'Image 2' }, // right-center
+  // Mobile-responsive node definitions
+  const getResponsiveLayout = () => {
+    if (typeof window === 'undefined') return { nodes: [], canvasWidth: 1200, canvasHeight: 500 };
     
-    // Bottom row - centered
-    { id: 1, x: startX + 160, y: startY + 180, w: 240, h: 140, type: '3dimage', label: '3D' }, // bottom-left
-    { id: 4, x: startX + 440, y: startY + 180, w: 240, h: 140, type: 'video', label: 'Video' }, // bottom-right
-  ];
+    const isMobile = window.innerWidth < 640;
+    const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
+    const isDesktop = window.innerWidth >= 1024;
+    
+    if (isMobile) {
+      // Mobile: Smaller nodes, vertical layout
+      const startX = 20;
+      const startY = 200;
+      const nodeWidth = 120;
+      const nodeHeight = 60;
+      
+      return {
+        canvasWidth: window.innerWidth - 40,
+        canvasHeight: 600,
+        nodes: [
+          { id: 5, x: startX, y: startY, w: nodeWidth + 20, h: nodeHeight, type: 'text', label: 'Text' },
+          { id: 2, x: startX + nodeWidth + 40, y: startY, w: nodeWidth, h: nodeHeight, type: 'lut', label: 'LUT' },
+          { id: 3, x: startX + 30, y: startY + 100, w: nodeWidth, h: nodeHeight + 20, type: 'image', label: 'Image' },
+          { id: 6, x: startX + nodeWidth + 50, y: startY + 100, w: nodeWidth, h: nodeHeight + 20, type: 'image2', label: 'Image 2' },
+          { id: 1, x: startX + 20, y: startY + 220, w: nodeWidth + 20, h: nodeHeight + 40, type: '3dimage', label: '3D' },
+          { id: 4, x: startX + nodeWidth + 60, y: startY + 220, w: nodeWidth + 20, h: nodeHeight + 40, type: 'video', label: 'Video' },
+        ]
+      };
+    } else if (isTablet) {
+      // Tablet: Medium-sized nodes
+      const startX = 60;
+      const startY = 220;
+      const nodeWidth = 140;
+      const nodeHeight = 70;
+      
+      return {
+        canvasWidth: window.innerWidth - 120,
+        canvasHeight: 500,
+        nodes: [
+          { id: 5, x: startX, y: startY, w: nodeWidth + 20, h: nodeHeight, type: 'text', label: 'Text' },
+          { id: 2, x: startX + 180, y: startY, w: nodeWidth, h: nodeHeight, type: 'lut', label: 'LUT' },
+          { id: 3, x: startX + 340, y: startY, w: nodeWidth, h: nodeHeight + 20, type: 'image', label: 'Image' },
+          { id: 6, x: startX + 500, y: startY, w: nodeWidth, h: nodeHeight + 20, type: 'image2', label: 'Image 2' },
+          { id: 1, x: startX + 120, y: startY + 150, w: nodeWidth + 40, h: nodeHeight + 50, type: '3dimage', label: '3D' },
+          { id: 4, x: startX + 320, y: startY + 150, w: nodeWidth + 40, h: nodeHeight + 50, type: 'video', label: 'Video' },
+        ]
+      };
+    } else {
+      // Desktop: Original large nodes
+      const startX = 100;
+      const startY = 280;
+      
+      return {
+        canvasWidth: 1200,
+        canvasHeight: 500,
+        nodes: [
+          { id: 5, x: startX, y: startY, w: 180, h: 80, type: 'text', label: 'Text' },
+          { id: 2, x: startX + 220, y: startY, w: 160, h: 80, type: 'lut', label: 'LUT' },
+          { id: 3, x: startX + 420, y: startY, w: 180, h: 120, type: 'image', label: 'Image' },
+          { id: 6, x: startX + 640, y: startY, w: 180, h: 120, type: 'image2', label: 'Image 2' },
+          { id: 1, x: startX + 160, y: startY + 180, w: 240, h: 140, type: '3dimage', label: '3D' },
+          { id: 4, x: startX + 440, y: startY + 180, w: 240, h: 140, type: 'video', label: 'Video' },
+        ]
+      };
+    }
+  };
+  
+  const { nodes: initialNodes, canvasWidth, canvasHeight } = getResponsiveLayout();
   const [nodes, setNodes] = React.useState(initialNodes);
   const [draggingId, setDraggingId] = React.useState<number | null>(null);
   const dragging = React.useRef<{ id: number | null; offsetX: number; offsetY: number }>({ id: null, offsetX: 0, offsetY: 0 });
   const liveNodes = React.useRef(nodes);
   React.useEffect(() => { liveNodes.current = nodes; }, [nodes]);
+
+  // Update layout on window resize
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (!isDragging.current) {
+        const { nodes: newNodes } = getResponsiveLayout();
+        setNodes(newNodes);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Connections: array of [fromId, toId] - clean flow from top to bottom
   const connections = [
@@ -605,6 +668,80 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
   const dragOffsetRef = React.useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const animationFrame = React.useRef<number | null>(null);
   const isDragging = React.useRef(false);
+
+  // Touch event handlers
+  function onTouchStart(e: React.TouchEvent<HTMLDivElement>, id: number) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const node = liveNodes.current.find(n => n.id === id);
+    if (!node) return;
+    
+    dragNodeRef.current = id;
+    dragOffsetRef.current = { x: touch.clientX - node.x, y: touch.clientY - node.y };
+    isDragging.current = true;
+    setDraggingId(id);
+    
+    // Add touch event listeners
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd, { passive: false });
+    
+    // Prevent text selection and other interactions
+    document.body.style.userSelect = 'none';
+    document.body.style.pointerEvents = 'none';
+    e.currentTarget.style.pointerEvents = 'auto';
+  }
+
+  function onTouchMove(e: TouchEvent) {
+    if (!isDragging.current || dragNodeRef.current == null) return;
+    
+    e.preventDefault();
+    const touch = e.touches[0];
+    const id = dragNodeRef.current;
+    const offset = dragOffsetRef.current;
+    let newY = touch.clientY - offset.y;
+    if (newY < 180) newY = 180; // Adjusted minY for mobile
+    
+    const newX = touch.clientX - offset.x;
+    
+    // Update node position immediately in ref for ultra-smooth dragging
+    liveNodes.current = liveNodes.current.map(n => 
+      n.id === id ? { ...n, x: newX, y: newY } : n
+    );
+    
+    // Cancel previous animation frame if it exists
+    if (animationFrame.current) {
+      cancelAnimationFrame(animationFrame.current);
+    }
+    
+    // Use requestAnimationFrame for smooth 60fps updates
+    animationFrame.current = requestAnimationFrame(() => {
+      setNodes([...liveNodes.current]);
+      animationFrame.current = null;
+    });
+  }
+
+  function onTouchEnd(e: TouchEvent) {
+    if (!isDragging.current) return;
+
+    e.preventDefault();
+    dragNodeRef.current = null;
+    isDragging.current = false;
+    setDraggingId(null);
+    
+    // Clean up event listeners
+    window.removeEventListener('touchmove', onTouchMove);
+    window.removeEventListener('touchend', onTouchEnd);
+    
+    // Restore body styles
+    document.body.style.userSelect = '';
+    document.body.style.pointerEvents = '';
+    
+    // Cancel any pending animation frame
+    if (animationFrame.current) {
+      cancelAnimationFrame(animationFrame.current);
+      animationFrame.current = null;
+    }
+  }
 
   function onMouseDown(e: React.MouseEvent<HTMLDivElement>, id: number) {
     e.preventDefault();
@@ -763,6 +900,7 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
           className={`absolute flex flex-col items-center ${draggingId === node.id ? 'z-50' : 'z-20'}`}
           style={{ left: node.x, top: node.y, width: node.w, height: node.h, pointerEvents: 'auto', userSelect: 'none' }}
           onMouseDown={e => onMouseDown(e, node.id)}
+          onTouchStart={e => onTouchStart(e, node.id)}
           onClick={() => {
             // Only trigger for specific node labels
             if (node.label === '3D') onNodeAction('3d');
@@ -773,8 +911,8 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
             // Add more mappings as needed
           }}
         >
-          {/* Label above node */}
-          <span className="mb-1 text-xs font-semibold text-white dark:text-white bg-black/60 dark:bg-black/80 px-2 py-0.5 rounded select-none" style={{ marginBottom: 2 }}>{node.label}</span>
+          {/* Label above node - Mobile Responsive */}
+          <span className="mb-1 text-xs sm:text-sm font-semibold text-white dark:text-white bg-black/60 dark:bg-black/80 px-2 py-0.5 rounded select-none" style={{ marginBottom: 2 }}>{node.label}</span>
           {/* Node content */}
           <div
             className={`w-full h-full bg-white/80 dark:bg-black/80 border border-gray-300 dark:border-gray-700 shadow-md flex items-center justify-center select-none cursor-move relative ${node.type === 'video' ? 'rounded-lg' : 'rounded-xl'}${draggingId === node.id ? ' shadow-2xl scale-105' : ''}`}
@@ -803,8 +941,8 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
                     panSpeed={0}
                     rotateSpeed={1}
                     screenSpacePanning={false}
-                    minDistance={3.2}
-                    maxDistance={3.2}
+                    minDistance={typeof window !== 'undefined' && window.innerWidth < 640 ? 3.2 : window.innerWidth < 768 ? 3.0 : 2.8}
+                    maxDistance={typeof window !== 'undefined' && window.innerWidth < 640 ? 3.2 : window.innerWidth < 768 ? 3.0 : 2.8}
                   />
                 </Canvas>
               </div>
@@ -831,7 +969,12 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
               </video>
             )}
             {node.type === 'text' && (
-              <span className="text-gray-700 dark:text-gray-200 text-xs px-2 text-center leading-tight" style={{ fontFamily: 'var(--font-sf-pro)' }}>A black and white photo of a girl looking straight with her hair tied back.</span>
+              <span className="text-gray-700 dark:text-gray-200 text-xs sm:text-sm px-2 text-center leading-tight" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+                {typeof window !== 'undefined' && window.innerWidth < 640 
+                  ? "A black and white photo of a girl."
+                  : "A black and white photo of a girl looking straight with her hair tied back."
+                }
+              </span>
             )}
           </div>
         </div>
@@ -917,6 +1060,26 @@ function Model3D({ url }: { url: string }) {
   const gltf = useGLTF(url);
   const ref = useRef<any>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [scale, setScale] = useState(1.2);
+
+  // Update scale based on screen size
+  React.useEffect(() => {
+    const updateScale = () => {
+      if (typeof window !== 'undefined') {
+        if (window.innerWidth < 640) {
+          setScale(0.8); // Mobile: smaller scale
+        } else if (window.innerWidth < 768) {
+          setScale(1.0); // Tablet: medium scale
+        } else {
+          setScale(1.2); // Desktop: original scale
+        }
+      }
+    };
+
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
 
   // Update rotation based on mouse position
   React.useEffect(() => {
@@ -942,7 +1105,7 @@ function Model3D({ url }: { url: string }) {
     }
   }, [mousePos]);
 
-  return <primitive object={gltf.scene} ref={ref} scale={1.05} position={[0, 0, 0]} />;
+  return <primitive object={gltf.scene} ref={ref} scale={scale} position={[0, 0, 0]} />;
 }
 
 // Preload the 3D model
