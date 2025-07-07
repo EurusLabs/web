@@ -304,7 +304,7 @@ export default function EurusStudioPage() {
                         }`}
                         style={{ 
                           fontFamily: 'var(--font-sf-pro)', 
-                          minWidth: window.innerWidth < 640 ? '100px' : window.innerWidth < 768 ? '150px' : '200px'
+                          minWidth: typeof window !== 'undefined' && window.innerWidth < 640 ? '100px' : window.innerWidth < 768 ? '150px' : '200px'
                         }}
                       >
                         {tool.label}

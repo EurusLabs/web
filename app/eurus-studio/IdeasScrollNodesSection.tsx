@@ -22,20 +22,20 @@ export default function IdeasScrollNodesSection() {
         const progress = Math.max(0, Math.min(1, (windowHeight - sectionTop) / (sectionHeight + windowHeight)));
         setProgress(progress);
         
-        // AGGRESSIVE approach: Always show Inspire first until section is well into viewport
-        if (sectionTop > windowHeight * 0.1) {
-          // Section is just entering viewport - ALWAYS show Inspire
-          setFocusedSection(0);
-        } else {
-          // Section is well into viewport - now use progress-based logic
-          if (progress < 0.65) {
-            setFocusedSection(0); // Inspire - extended range
-          } else if (progress < 0.88) {
-            setFocusedSection(1); // Refine - middle range
-          } else {
-            setFocusedSection(2); // Craft - final range
-          }
-        }
+                 // BALANCED approach: Ensure all three sections get proper highlighting
+         if (sectionTop > windowHeight * 0.1) {
+           // Section is just entering viewport - ALWAYS show Inspire
+           setFocusedSection(0);
+         } else {
+           // Section is well into viewport - balanced progress-based logic
+           if (progress < 0.45) {
+             setFocusedSection(0); // Inspire - good initial range
+           } else if (progress < 0.75) {
+             setFocusedSection(1); // Refine - middle range
+           } else {
+             setFocusedSection(2); // Craft - final range (lowered from 88% to 75%)
+           }
+         }
       } else if (sectionTop >= windowHeight) {
         // Section is below viewport
         setProgress(0);
