@@ -318,6 +318,9 @@ export default function EurusStudioPage() {
         {/* Section: Control the Outcome */}
         {/* Layered Visual Placeholder: Placeholder for multiple layered images */}
         <IdeasScrollNodesSection />
+
+        {/* New Scroll Section - Similar to Eurus Labs page */}
+        <ProductsScrollSectionStudioLanding />
       </main>
     </div>
   )
@@ -528,6 +531,298 @@ function ProductsScrollSectionStudio() {
       </div>
     </div>
   );
+}
+
+// New scroll section similar to the one from the main Eurus Labs page
+function ProductsScrollSectionStudioLanding() {
+  const products = [
+    {
+      name: "Eidos",
+      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract4.mp4",
+      description: "Eidos is the world-leading generative AI for text, code, and more.",
+      link: "https://eidos.press/",
+    },
+    {
+      name: "Relay",
+      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract1.mp4",
+      description: "Relay brings next-gen video and image generation to creators.",
+      link: "https://www.relayedstories.com/",
+    },
+    {
+      name: "Studio",
+      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract3.mp4",
+      description: "Studio is a powerful AI for video understanding and creative editing.",
+      link: "https://kind-mud-06307e40f.2.azurestaticapps.net",
+    },
+    {
+      name: "Draft",
+      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract2.mp4",
+      description: "Draft enables advanced audio and speech synthesis for your projects.",
+      link: "https://red-forest-0721f660f.6.azurestaticapps.net/",
+    },
+  ]
+
+  const [current, setCurrent] = React.useState(0)
+  const [isFullyVisible, setIsFullyVisible] = React.useState(false)
+  const [hasStartedScrolling, setHasStartedScrolling] = React.useState(false)
+  const containerRef = React.useRef<HTMLDivElement>(null)
+  const isScrollingRef = React.useRef(false)
+  const scrollTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
+  const isReleasingScrollRef = React.useRef(false)
+
+  // Scroll direction tracking for intelligent snapping
+  const [scrollDirection, setScrollDirection] = React.useState<"up" | "down">("down")
+  const lastScrollY = React.useRef(0)
+
+  // Track scroll direction
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      if (currentScrollY > lastScrollY.current) {
+        setScrollDirection("down")
+      } else {
+        setScrollDirection("up")
+      }
+      lastScrollY.current = currentScrollY
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  // Effect to lock and unlock body scroll
+  React.useEffect(() => {
+    const originalOverflow = document.body.style.overflow
+    if (isFullyVisible && !isReleasingScrollRef.current) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = originalOverflow
+    }
+    return () => {
+      document.body.style.overflow = originalOverflow
+    }
+  }, [isFullyVisible])
+
+  // Simplified and smooth wheel handler
+  const handleGlobalWheel = React.useCallback(
+    (e: WheelEvent) => {
+      // If we're releasing scroll, don't interfere
+      if (isReleasingScrollRef.current) {
+        return
+      }
+
+      // Prevent any scrolling if we're currently transitioning
+      if (isScrollingRef.current) {
+        e.preventDefault()
+        e.stopPropagation()
+        return
+      }
+
+      // Always prevent default page scrolling when in this section
+      e.preventDefault()
+      e.stopPropagation()
+
+      const direction = e.deltaY > 0 ? 1 : -1
+      const newIndex = current + direction
+
+      // Handle boundary conditions
+      if (newIndex < 0) {
+        // Scroll up from Eidos: allow page scroll to previous section
+        isReleasingScrollRef.current = true
+        setIsFullyVisible(false)
+        document.body.style.overflow = ""
+        
+        setTimeout(() => {
+          isReleasingScrollRef.current = false
+        }, 1000)
+        return
+      }
+
+      if (newIndex >= products.length) {
+        // Scroll down from Draft: allow page scroll to next section
+        isReleasingScrollRef.current = true
+        setIsFullyVisible(false)
+        document.body.style.overflow = ""
+        
+        setTimeout(() => {
+          isReleasingScrollRef.current = false
+        }, 1000)
+        return
+      }
+
+      // Valid internal navigation
+      if (newIndex >= 0 && newIndex < products.length && newIndex !== current) {
+        isScrollingRef.current = true
+        setCurrent(newIndex)
+
+        if (current === 0 && direction > 0) {
+          setHasStartedScrolling(true)
+        }
+
+        // Clear existing timeout
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current)
+        }
+
+        // Reset scrolling flag after animation - longer timeout for smoother experience
+        scrollTimeoutRef.current = setTimeout(() => {
+          isScrollingRef.current = false
+        }, 800) // Longer timeout to prevent rapid scrolling
+      }
+    },
+    [current, products.length],
+  )
+
+  // Intersection Observer to detect when the component is in view and auto-snap
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const intersectionRatio = entry.intersectionRatio
+        const isIntersecting = entry.isIntersecting
+
+        // Reset to Eidos when section first becomes visible
+        if (isIntersecting && intersectionRatio > 0.1 && !isFullyVisible) {
+          setCurrent(0)
+          setHasStartedScrolling(false)
+        }
+
+        // Auto-snap to full view when 50% visible
+        if (
+          isIntersecting &&
+          intersectionRatio >= 0.5 &&
+          intersectionRatio < 0.95 &&
+          !isFullyVisible &&
+          !isReleasingScrollRef.current
+        ) {
+          // Smooth scroll to make the section fully visible
+          containerRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          })
+
+          // Always start with Eidos when coming from above (tools section)
+          setCurrent(0)
+          setHasStartedScrolling(false)
+          return
+        }
+
+        // Set fully visible when 95% or more is visible
+        if (
+          intersectionRatio >= 0.95 &&
+          !isFullyVisible &&
+          !isReleasingScrollRef.current
+        ) {
+          setIsFullyVisible(true)
+          // ALWAYS ensure we start with Eidos when becoming fully visible from any direction
+          setCurrent(0)
+          setHasStartedScrolling(false)
+        } else if (intersectionRatio < 0.3 && isFullyVisible) {
+          // Only reset if we're actually leaving the section (less than 30% visible)
+          setTimeout(() => {
+            if (
+              !containerRef.current ||
+              containerRef.current.getBoundingClientRect().top > window.innerHeight ||
+              containerRef.current.getBoundingClientRect().bottom < 0
+            ) {
+              setIsFullyVisible(false)
+              setCurrent(0)
+              setHasStartedScrolling(false)
+              isReleasingScrollRef.current = false
+            }
+          }, 100)
+        }
+      },
+      {
+        threshold: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95], // Multiple thresholds for precise detection
+      },
+    )
+
+    const currentRef = containerRef.current
+    if (currentRef) {
+      observer.observe(currentRef)
+    }
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef)
+      }
+    }
+  }, [isFullyVisible, scrollDirection, current])
+
+  // Add/remove the wheel event listener based on visibility
+  React.useEffect(() => {
+    if (isFullyVisible && !isReleasingScrollRef.current) {
+      window.addEventListener("wheel", handleGlobalWheel, { passive: false })
+    }
+    return () => {
+      window.removeEventListener("wheel", handleGlobalWheel)
+    }
+  }, [isFullyVisible, handleGlobalWheel])
+
+  // Cleanup timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+      }
+      // Reset all scroll-related refs
+      isReleasingScrollRef.current = false
+    }
+  }, [])
+
+  return (
+    <div ref={containerRef} id="products-scroll-viewport-studio-landing" className="w-full h-screen relative overflow-hidden scroll-snap-section">
+      {/* Video backgrounds for each product */}
+      {products.map((product, idx) => (
+        <video
+          key={product.name}
+          src={product.videoSrc}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-in-out z-0 ${
+            current === idx ? "opacity-100" : "opacity-0"
+          }`}
+          style={{ pointerEvents: "none" }}
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+      ))}
+      <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
+      
+      {/* Left side heading */}
+      <div className="absolute left-4 sm:left-6 md:left-8 lg:left-10 top-1/2 -translate-y-1/2 z-20 max-w-[60%] sm:max-w-none pointer-events-none">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white drop-shadow-lg leading-tight" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+          Build with the<br />Eurus Ecosystem.
+        </h2>
+      </div>
+      
+      {/* Right side product names */}
+      <div className="absolute right-4 sm:right-6 md:right-8 lg:right-10 top-1/2 -translate-y-1/2 flex flex-col items-end gap-1 sm:gap-2 md:gap-3 z-20 pointer-events-none max-w-[35%] sm:max-w-none">
+        {products.map((p, i) => (
+          <span
+            key={p.name}
+            className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-right transition-all duration-300 ${
+              current === i ? "text-yellow-200" : "text-white/80"
+            }`}
+            style={{ 
+              fontFamily: "var(--font-sf-pro)", 
+              opacity: current === i ? 1 : 0.7,
+              transform: current === i ? 'scale(1.05)' : 'scale(1)',
+              textShadow: current === i ? '0 4px 20px rgba(255, 235, 59, 0.3)' : '0 2px 10px rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            {p.name}
+          </span>
+        ))}
+      </div>
+      
+      {/* Bottom center description */}
+      <div className="absolute left-1/2 bottom-6 sm:bottom-8 md:bottom-10 -translate-x-1/2 z-30 pointer-events-none">
+        <span className="text-base sm:text-lg md:text-xl font-medium text-white drop-shadow-lg px-4 text-center" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+          {products[current].description}
+        </span>
+      </div>
+    </div>
+  )
 }
 
 function InfiniteCanvasBackground() {
