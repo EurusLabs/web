@@ -53,7 +53,7 @@ const IdeasScrollNodesSection = dynamic(() => import('./IdeasScrollNodesSection'
 export default function EurusStudioPage() {
   const toolImages = [
     { label: 'Video', image: '/images/topvideo.mp4', isVideo: true },
-    { label: 'Original', image: '/images/topcrop.png' },
+    { label: 'Image', image: '/images/topcrop.png' },
     { label: 'Extend', image: '/images/topbg.jpeg' },
     { label: 'Invert', image: '/images/topinvert.png' },
     { label: 'Image Describer', image: '/images/top.jpg', hasTextOverlay: true },
@@ -61,12 +61,12 @@ export default function EurusStudioPage() {
     { label: 'Depth Extractor', image: '/images/topz.png' },
     { label: '3D', image: '/images/top3D.glb', is3D: true },
     { label: 'LUT', image: '/images/toplut.jpeg' },
-    { label: 'Prompt a change', image: '/images/top.jpg' },
   ];
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
   const [activeImage, setActiveImage] = useState('/images/topvideo.mp4');
   const [imageLoaded, setImageLoaded] = useState(true);
   const [is3D, setIs3D] = useState(false);
+  const [scrollAccumulator, setScrollAccumulator] = useState(0);
   function handleNextImage() {
     const nextIdx = (currentImageIdx + 1) % toolImages.length;
     setCurrentImageIdx(nextIdx);
@@ -116,54 +116,54 @@ export default function EurusStudioPage() {
           {/* Full screen media with overlay text and side options */}
           <div
             className="relative w-full h-full flex items-center justify-center overflow-hidden bg-black group"
+            onWheel={(e) => {
+              // Handle both horizontal and vertical scrolling with threshold
+              e.preventDefault();
+              const scrollDelta = e.deltaY + e.deltaX;
+              const newAccumulator = scrollAccumulator + scrollDelta;
+              const threshold = 150; // Require more scrolling to trigger change
+              
+              if (Math.abs(newAccumulator) >= threshold) {
+                const direction = newAccumulator > 0 ? 1 : -1;
+                const nextIdx = direction > 0 
+                  ? (currentImageIdx + 1) % toolImages.length
+                  : currentImageIdx === 0 ? toolImages.length - 1 : currentImageIdx - 1;
+                setCurrentImageIdx(nextIdx);
+                setActiveImage(toolImages[nextIdx].image);
+                setImageLoaded(true);
+                setScrollAccumulator(0); // Reset accumulator after change
+              } else {
+                setScrollAccumulator(newAccumulator);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const prevIdx = currentImageIdx === 0 ? toolImages.length - 1 : currentImageIdx - 1;
+                setCurrentImageIdx(prevIdx);
+                setActiveImage(toolImages[prevIdx].image);
+                setImageLoaded(true);
+              } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                const nextIdx = (currentImageIdx + 1) % toolImages.length;
+                setCurrentImageIdx(nextIdx);
+                setActiveImage(toolImages[nextIdx].image);
+                setImageLoaded(true);
+              }
+            }}
+            tabIndex={0}
+            style={{ outline: 'none' }}
           >
               <div className="w-full h-full relative overflow-hidden z-10">
                 {toolImages[currentImageIdx].is3D ? (
                   <div 
                     key={`3d-${currentImageIdx}-${activeImage}`}
-                    className="absolute inset-0 h-full flex items-center justify-center"
+                    className="absolute inset-0 w-full h-full flex items-center justify-center"
                     style={{ 
-                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
-                      marginLeft: '200px',
-                      width: 'calc(100% - 200px)'
+                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards'
                     }}
                   >
-                    <div
-                      className="w-full h-full"
-                      onMouseMove={(e) => {
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-                        // Only store horizontal mouse position for 3D model rotation
-                        const canvas = e.currentTarget.querySelector('canvas');
-                        if (canvas) {
-                          (canvas as any).mouseX = x;
-                          // Do NOT store mouseY to prevent pitch to zoom effect
-                        }
-                      }}
-                      onWheel={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
-                      onTouchStart={(e) => {
-                        if (e.touches.length > 1) {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }
-                      }}
-                      onTouchMove={(e) => {
-                        if (e.touches.length > 1) {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }
-                      }}
-                      style={{
-                        touchAction: 'none',
-                        userSelect: 'none',
-                        WebkitUserSelect: 'none',
-                        MozUserSelect: 'none',
-                        msUserSelect: 'none'
-                      }}
-                    >
+                    <div className="w-full h-full">
                       <Canvas 
                         camera={{ position: [0, 0, 3.2] }} 
                         className="w-full h-full" 
@@ -173,18 +173,23 @@ export default function EurusStudioPage() {
                         <directionalLight position={[2, 4, 2]} intensity={1.5} castShadow />
                         <Environment preset="city" />
                         <Model3D url={activeImage} />
-                        <RotationOnlyControls />
+                        <OrbitControls 
+                          enableZoom={false}
+                          enablePan={false}
+                          enableRotate={true}
+                          autoRotate={false}
+                          rotateSpeed={1}
+                          target={[0, 0, 0]}
+                        />
                       </Canvas>
                     </div>
                   </div>
                 ) : toolImages[currentImageIdx].isVideo ? (
                   <div 
                     key={`video-${currentImageIdx}-${activeImage}`}
-                    className="h-full flex items-center justify-center relative"
+                    className="w-full h-full flex items-center justify-center relative"
                     style={{ 
-                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
-                      marginLeft: '200px',
-                      width: 'calc(100% - 200px)'
+                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards'
                     }}
                   >
                     <video
@@ -202,13 +207,11 @@ export default function EurusStudioPage() {
                 ) : (
                   <div 
                     key={`image-${currentImageIdx}-${activeImage}`}
-                    className={`h-full flex items-center justify-center relative ${
-                      toolImages[currentImageIdx].label === 'Original' ? 'bg-black' : ''
+                    className={`w-full h-full flex items-center justify-center relative ${
+                      toolImages[currentImageIdx].label === 'Image' ? 'bg-black' : ''
                     }`}
                     style={{ 
-                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
-                      marginLeft: '200px',
-                      width: 'calc(100% - 200px)'
+                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards'
                     }}
                   >
                     <img
@@ -216,7 +219,7 @@ export default function EurusStudioPage() {
                       src={activeImage}
                       alt={toolImages[currentImageIdx].label}
                       className={`${
-                        toolImages[currentImageIdx].label === 'Original' 
+                        toolImages[currentImageIdx].label === 'Image' 
                           ? 'max-w-full max-h-full object-contain' 
                           : 'w-full h-full object-cover'
                       }`}
@@ -228,21 +231,32 @@ export default function EurusStudioPage() {
                 )}
               </div>
               
-                                          {/* Title text overlay - CENTER TOP */}
-              <div className="absolute top-8 left-0 right-0 flex justify-center pointer-events-none z-50">
-                <div className="text-center" style={{ marginLeft: '100px' }}>
-                  <h2 className={`text-3xl md:text-4xl font-extrabold mb-2 leading-tight ${
-                    ['Original', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black'
-                  }`} style={{ letterSpacing: '-0.01em', fontFamily: 'var(--font-sf-pro)' }}>
-                    All the tools you trust.<br />Now in one flow.
-                  </h2>
-                  <p className={`text-base md:text-lg font-light ${
-                    ['Original', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white/90' : 'text-black/80'
-                  }`} style={{ fontFamily: 'var(--font-sf-pro)' }}>
-                    From cropping to relighting—designed for flow.
-                  </p>
+              {/* Title text overlay - CENTER TOP - Hidden for 3D */}
+              {!toolImages[currentImageIdx].is3D && (
+                <div className="absolute top-8 left-0 right-0 flex justify-center pointer-events-none z-50">
+                  <div className="text-center">
+                    <h2 className={`text-5xl md:text-7xl font-bold mb-2 leading-tight ${
+                      ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black'
+                    }`} style={{ letterSpacing: '-0.01em', fontFamily: 'var(--font-sf-pro)' }}>
+                      All the tools you trust.<br />Now in one flow.
+                    </h2>
+                    <p className={`text-base md:text-lg font-light ${
+                      ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white/90' : 'text-black/80'
+                    }`} style={{ fontFamily: 'var(--font-sf-pro)' }}>
+                      From cropping to relighting—designed for flow.
+                    </p>
 
+                  </div>
                 </div>
+              )}
+
+              {/* Current tool name overlay - BOTTOM CENTER */}
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 pointer-events-none z-50">
+                <h3 className={`text-2xl md:text-3xl font-bold ${
+                  ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black'
+                }`} style={{ fontFamily: 'var(--font-sf-pro)', textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}>
+                  {toolImages[currentImageIdx].label}
+                </h3>
               </div>
 
               {/* Image description for Image Describer */}
@@ -250,7 +264,7 @@ export default function EurusStudioPage() {
                 <div className="absolute right-0 top-0 h-full flex items-center pointer-events-none z-30">
                   <div className="text-right max-w-md pr-8">
                     <p className={`text-lg md:text-xl font-medium leading-relaxed ${
-                      ['Original', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black'
+                      ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black'
                     }`} style={{ fontFamily: 'var(--font-sf-pro)' }}>
                       The image shows a beautifully crafted wooden spinning top placed upright on a flat, textured surface. The top is made of polished wood with rich, natural grain patterns and a warm, amber-brown hue.
                     </p>
@@ -258,30 +272,43 @@ export default function EurusStudioPage() {
                 </div>
               )}
 
-              {/* Left side options list covering the image - always visible */}
-              <div className="absolute left-0 top-0 h-full flex items-center z-40 bg-white">
-                <div className="h-full flex items-center px-8">
-                  <div className="flex flex-col gap-2">
-                    {toolImages.map((tool, idx) => (
-                      <button
-                        key={tool.label}
-                        onClick={() => {
-                          setCurrentImageIdx(idx);
-                          setActiveImage(tool.image);
-                          setImageLoaded(true);
-                        }}
-                        className={`px-4 py-3 font-bold text-lg transition-all duration-200 focus:outline-none text-left ${
-                          currentImageIdx === idx 
-                            ? 'text-black'
-                            : 'text-black/30 hover:text-black/60'
-                        }`}
-                        style={{ fontFamily: 'var(--font-sf-pro)', minWidth: '200px' }}
-                      >
-                        {tool.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+              {/* Navigation arrows for switching tools - no button styling */}
+              <div
+                onClick={() => {
+                  const prevIdx = currentImageIdx === 0 ? toolImages.length - 1 : currentImageIdx - 1;
+                  setCurrentImageIdx(prevIdx);
+                  setActiveImage(toolImages[prevIdx].image);
+                  setImageLoaded(true);
+                }}
+                className={`absolute left-4 top-1/2 -translate-y-1/2 z-50 cursor-pointer transition-all duration-200 ${
+                  ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) 
+                    ? 'text-white hover:text-white/70' 
+                    : 'text-black hover:text-black/70'
+                }`}
+                style={{ pointerEvents: 'auto' }}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              
+              <div
+                onClick={() => {
+                  const nextIdx = (currentImageIdx + 1) % toolImages.length;
+                  setCurrentImageIdx(nextIdx);
+                  setActiveImage(toolImages[nextIdx].image);
+                  setImageLoaded(true);
+                }}
+                className={`absolute right-4 top-1/2 -translate-y-1/2 z-50 cursor-pointer transition-all duration-200 ${
+                  ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) 
+                    ? 'text-white hover:text-white/70' 
+                    : 'text-black hover:text-black/70'
+                }`}
+                style={{ pointerEvents: 'auto' }}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
               
               {!imageLoaded && (
