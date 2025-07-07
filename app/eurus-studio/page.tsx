@@ -162,8 +162,8 @@ export default function EurusStudioPage() {
                     <div className="w-full h-full">
                       <Canvas 
                         camera={{ 
-                          position: [0, 0, typeof window !== 'undefined' && window.innerWidth < 640 ? 3.2 : window.innerWidth < 768 ? 3.0 : 2.8],
-                          fov: typeof window !== 'undefined' && window.innerWidth < 640 ? 60 : 50
+                          position: [0, 0, 2.8],
+                          fov: 50
                         }} 
                         className="w-full h-full" 
                         style={{ background: '#111' }}
@@ -855,10 +855,16 @@ function InfiniteCanvasBackground() {
 
 function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) => void }) {
   const smallOrbitControlsRef = useRef<any>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Hydration-safe mount check
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   
   // Mobile-responsive node definitions
   const getResponsiveLayout = () => {
-    if (typeof window === 'undefined') return { nodes: [], canvasWidth: 1200, canvasHeight: 500 };
+    if (!isMounted) return { nodes: [], canvasWidth: 1200, canvasHeight: 500 };
     
     const isMobile = window.innerWidth < 640;
     const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
@@ -1222,7 +1228,7 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
                   }>
                     <Model3D url="/images/girl3D.glb" />
                   </React.Suspense>
-                  <OrbitControls 
+                                      <OrbitControls 
                     ref={smallOrbitControlsRef}
                     enablePan={false} 
                     enableZoom={false} 
@@ -1232,8 +1238,8 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
                     panSpeed={0}
                     rotateSpeed={1}
                     screenSpacePanning={false}
-                    minDistance={typeof window !== 'undefined' && window.innerWidth < 640 ? 3.2 : window.innerWidth < 768 ? 3.0 : 2.8}
-                    maxDistance={typeof window !== 'undefined' && window.innerWidth < 640 ? 3.2 : window.innerWidth < 768 ? 3.0 : 2.8}
+                    minDistance={isMounted && window.innerWidth < 640 ? 3.2 : isMounted && window.innerWidth < 768 ? 3.0 : 2.8}
+                    maxDistance={isMounted && window.innerWidth < 640 ? 3.2 : isMounted && window.innerWidth < 768 ? 3.0 : 2.8}
                   />
                 </Canvas>
               </div>
@@ -1261,7 +1267,7 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
             )}
             {node.type === 'text' && (
               <span className="text-gray-700 dark:text-gray-200 text-xs sm:text-sm px-2 text-center leading-tight" style={{ fontFamily: 'var(--font-sf-pro)' }}>
-                {typeof window !== 'undefined' && window.innerWidth < 640 
+                {isMounted && window.innerWidth < 640 
                   ? "A black and white photo of a girl."
                   : "A black and white photo of a girl looking straight with her hair tied back."
                 }
@@ -1356,14 +1362,12 @@ function Model3D({ url }: { url: string }) {
   // Update scale based on screen size
   React.useEffect(() => {
     const updateScale = () => {
-      if (typeof window !== 'undefined') {
-        if (window.innerWidth < 640) {
-          setScale(0.8); // Mobile: smaller scale
-        } else if (window.innerWidth < 768) {
-          setScale(1.0); // Tablet: medium scale
-        } else {
-          setScale(1.2); // Desktop: original scale
-        }
+      if (window.innerWidth < 640) {
+        setScale(0.8); // Mobile: smaller scale
+      } else if (window.innerWidth < 768) {
+        setScale(1.0); // Tablet: medium scale
+      } else {
+        setScale(1.2); // Desktop: original scale
       }
     };
 
