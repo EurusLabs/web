@@ -3,6 +3,11 @@
 # Set variables
 STORAGE_ACCOUNT="eurusworkflows"
 CONTAINER_NAME="eurusworkflows"
+RESOURCE_GROUP="EurusLabs"
+
+# Get storage account key
+echo "🔑 Getting storage account key..."
+STORAGE_KEY=$(az storage account keys list --account-name $STORAGE_ACCOUNT --resource-group $RESOURCE_GROUP --query '[0].value' --output tsv)
 
 echo "🔐 Logging in to Azure..."
 # Check if already logged in
@@ -44,7 +49,7 @@ find public -type f \( ! -name "*.html" \) | while read -r file; do
         --container-name $CONTAINER_NAME \
         --name "$relative_path" \
         --file "$file" \
-        --auth-mode login \
+        --account-key "$STORAGE_KEY" \
         --overwrite true; then
 
         # Get the URL
@@ -52,7 +57,7 @@ find public -type f \( ! -name "*.html" \) | while read -r file; do
             --account-name $STORAGE_ACCOUNT \
             --container-name $CONTAINER_NAME \
             --name "$relative_path" \
-            --auth-mode login \
+            --account-key "$STORAGE_KEY" \
             --output tsv)
 
         # Store the mapping
