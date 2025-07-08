@@ -198,14 +198,18 @@ function IdeasScrollSection() {
       }
     }
     
+    // Add event listeners
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('wheel', onWheel, { passive: false });
     window.addEventListener('touchstart', onTouchStart, { passive: false });
     window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('touchend', onTouchEnd, { passive: false });
     window.addEventListener('keydown', onKeyDown, { passive: false });
+    
+    // Initial scroll check
     onScroll();
     
+    // Cleanup function
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('wheel', onWheel);
