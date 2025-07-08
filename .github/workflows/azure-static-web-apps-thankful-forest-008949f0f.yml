@@ -26,12 +26,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-      - name: Clear npm cache
-        run: npm cache clean --force
-      - name: Remove lock files
-        run: rm -f package-lock.json pnpm-lock.yaml
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm cache clean --force
+          rm -f package-lock.json pnpm-lock.yaml
+          npm install --ignore-platform --no-optional
+      - name: Build project
+        run: npm run build
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
