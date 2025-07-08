@@ -551,7 +551,7 @@ function ProductsScrollSectionStudioLanding() {
       name: "Eidos",
       videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract4.mp4",
       description: "Eidos is the world-leading generative AI for text, code, and more.",
-      link: "https://eidos.press/",
+      link: "https://apps.apple.com/us/app/eidos-press/id6742799522",
     },
     {
       name: "Relay",

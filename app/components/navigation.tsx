@@ -136,7 +136,7 @@ export default function Navigation({ forceWhite = false }: NavigationProps) {
         <div className="mt-16 space-y-2">
           {[
             { label: "Product", isDropdown: true, items: [
-              { name: "Eidos", href: "https://eidos.press/", external: true },
+              { name: "Eidos", href: "https://apps.apple.com/us/app/eidos-press/id6742799522", external: true },
               { name: "Studio", href: "/eurus-studio" },
               { name: "Draft", href: "https://red-forest-0721f660f.6.azurestaticapps.net/" },
               { name: "Relay", href: "https://www.relayedstories.com/", external: true }

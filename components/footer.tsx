@@ -46,7 +46,7 @@ export default function Footer() {
             <a href="https://kind-mud-06307e40f.2.azurestaticapps.net" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Studio</a>
             <a href="https://red-forest-0721f660f.6.azurestaticapps.net/" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Draft</a>
             <a href="https://www.relayedstories.com/" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Relay</a>
-            <a href="https://eidos.press/" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Eidos</a>
+            <a href="https://apps.apple.com/us/app/eidos-press/id6742799522" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Eidos</a>
           </div>
           {/* Company vertical */}
           <div className="flex flex-col items-start gap-1 sm:gap-2">
