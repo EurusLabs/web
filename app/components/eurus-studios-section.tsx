@@ -6,7 +6,7 @@ export function EurusStudiosSection() {
   return (
     <div className="bg-background text-foreground min-h-screen flex flex-col justify-center items-center scroll-snap-section">
       <div className="flex flex-col justify-center items-center w-full max-w-4xl mx-auto h-full gap-8 px-4">
-        <h1 className="text-5xl md:text-7xl font-bold text-center" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-center whitespace-nowrap" style={{ fontFamily: 'var(--font-sf-pro)' }}>
           For anyone with a story to tell.
         </h1>
         <div className="relative w-full max-w-3xl aspect-video rounded-2xl overflow-hidden shadow-2xl flex justify-center items-center">

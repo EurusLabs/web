@@ -40,33 +40,294 @@ import dynamic from 'next/dynamic';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Stage, Environment, useGLTF } from '@react-three/drei';
 
-// Dynamically import the scroll section component to avoid SSR issues
-const IdeasScrollNodesSection = dynamic(() => import('./IdeasScrollNodesSection'), {
-  ssr: false,
-  loading: () => (
-    <section className="w-screen h-[300vh] bg-black relative flex flex-col items-center justify-center">
-      <div className="text-white text-xl">Loading...</div>
-    </section>
-  )
-});
+// Ideas Scroll Section Component - inline to integrate with main page
+function IdeasScrollSection() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [focusedSection, setFocusedSection] = useState(0); // 0 = Inspire, 1 = Refine, 2 = Craft
+  const [isScrollLocked, setIsScrollLocked] = useState(false);
+  const [hasCompletedSequence, setHasCompletedSequence] = useState(false);
+  const [wheelAccumulator, setWheelAccumulator] = useState(0);
+  const isTransitioning = useRef(false);
+  const touchStartY = useRef(0);
+  const touchAccumulator = useRef(0);
+
+  useEffect(() => {
+    function onScroll() {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const sectionTop = rect.top;
+      const sectionBottom = rect.bottom;
+      
+      // Check if section is in viewport
+      const isInViewport = sectionTop < windowHeight && sectionBottom > 0;
+      
+      // Only lock when section is centered and user hasn't completed sequence
+      const isCentered = sectionTop <= 100 && sectionBottom >= windowHeight - 100;
+      
+      if (isCentered && !hasCompletedSequence) {
+        setIsScrollLocked(true);
+      } else {
+        setIsScrollLocked(false);
+        
+        // Reset sequence if we've scrolled away from the section
+        if (!isInViewport && hasCompletedSequence) {
+          setHasCompletedSequence(false);
+          setFocusedSection(0);
+        }
+      }
+    }
+
+    function handleTransition(direction: number) {
+      if (direction > 0) {
+        // Scrolling down
+        if (focusedSection < 2) {
+          isTransitioning.current = true;
+          setFocusedSection(prev => prev + 1);
+          
+          setTimeout(() => {
+            isTransitioning.current = false;
+          }, 700);
+        } else if (focusedSection === 2) {
+          // At Craft - complete sequence and allow normal scrolling
+          setHasCompletedSequence(true);
+          setIsScrollLocked(false);
+        }
+      } else {
+        // Scrolling up
+        if (focusedSection > 0) {
+          isTransitioning.current = true;
+          setFocusedSection(prev => prev - 1);
+          
+          setTimeout(() => {
+            isTransitioning.current = false;
+          }, 700);
+        }
+      }
+    }
+
+    function onWheel(e: WheelEvent) {
+      if (!sectionRef.current || !isScrollLocked) return;
+      
+      // Only hijack scroll when section is properly centered
+      const rect = sectionRef.current.getBoundingClientRect();
+      const isCentered = rect.top <= 100 && rect.bottom >= window.innerHeight - 100;
+      
+      if (!isCentered) return;
+      
+      // Prevent default scrolling when section is locked and centered
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Don't process wheel events during transitions
+      if (isTransitioning.current) return;
+      
+      // Accumulate wheel delta for more precise control
+      const newAccumulator = wheelAccumulator + e.deltaY;
+      setWheelAccumulator(newAccumulator);
+      
+      // Threshold for triggering transitions
+      const threshold = 80;
+      
+      if (Math.abs(newAccumulator) > threshold) {
+        const direction = newAccumulator > 0 ? 1 : -1;
+        setWheelAccumulator(0);
+        handleTransition(direction);
+      }
+    }
+
+    function onTouchStart(e: TouchEvent) {
+      if (!sectionRef.current || !isScrollLocked) return;
+      
+      const rect = sectionRef.current.getBoundingClientRect();
+      const isCentered = rect.top <= 100 && rect.bottom >= window.innerHeight - 100;
+      
+      if (!isCentered) return;
+      
+      touchStartY.current = e.touches[0].clientY;
+      touchAccumulator.current = 0;
+    }
+
+    function onTouchMove(e: TouchEvent) {
+      if (!sectionRef.current || !isScrollLocked) return;
+      
+      const rect = sectionRef.current.getBoundingClientRect();
+      const isCentered = rect.top <= 100 && rect.bottom >= window.innerHeight - 100;
+      
+      if (!isCentered) return;
+      
+      // Prevent default scrolling when section is locked and centered
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Don't process touch events during transitions
+      if (isTransitioning.current) return;
+      
+      const currentY = e.touches[0].clientY;
+      const deltaY = touchStartY.current - currentY;
+      touchAccumulator.current += deltaY;
+      touchStartY.current = currentY;
+      
+      // Threshold for triggering transitions on touch
+      const threshold = 40;
+      
+      if (Math.abs(touchAccumulator.current) > threshold) {
+        const direction = touchAccumulator.current > 0 ? 1 : -1;
+        touchAccumulator.current = 0;
+        handleTransition(direction);
+      }
+    }
+
+    function onTouchEnd(e: TouchEvent) {
+      if (!sectionRef.current || !isScrollLocked) return;
+      touchAccumulator.current = 0;
+    }
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (!sectionRef.current || !isScrollLocked) return;
+      
+      // Don't process key events during transitions
+      if (isTransitioning.current) return;
+      
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        handleTransition(1);
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        handleTransition(-1);
+      }
+    }
+    
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('touchstart', onTouchStart, { passive: false });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd, { passive: false });
+    window.addEventListener('keydown', onKeyDown, { passive: false });
+    onScroll();
+    
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isScrollLocked, hasCompletedSequence, wheelAccumulator, focusedSection]);
+
+  const sections = [
+    {
+      id: 0,
+      title: "Inspire",
+      image: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/oldman1.png",
+      alt: "Old Man 1",
+      isVideo: false
+    },
+    {
+      id: 1,
+      title: "Refine",
+      image: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/oldman2.jpg",
+      alt: "Old Man 2",
+      isVideo: false
+    },
+    {
+      id: 2,
+      title: "Craft",
+      image: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/oldman3.mp4",
+      alt: "Old Man 3",
+      isVideo: true
+    }
+  ];
+
+  return (
+    <section
+      ref={sectionRef}
+      className="w-screen bg-black flex flex-col items-center justify-center p-0 m-0 relative"
+      style={{ minHeight: '100vh', padding: '2rem 0', margin: 0 }}
+    >
+      <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 sm:mb-8 md:mb-10 leading-tight text-center" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+        Ideas don't wait. Neither should you.
+      </h2>
+      <div className="relative w-full flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 md:gap-8 h-auto sm:h-[60vh] px-4 sm:px-6 md:px-8">
+        {sections.map((section, idx) => (
+          <div 
+            key={section.id}
+            className="transition-all duration-700 ease-in-out flex flex-col items-center mb-6 sm:mb-0" 
+            style={{ 
+              opacity: focusedSection === idx ? 1 : 0.4,
+              transform: focusedSection === idx ? 'scale(1.05)' : 'scale(0.95)',
+              filter: focusedSection === idx ? 'brightness(1.1)' : 'brightness(0.7)'
+            }}
+          >
+            <div className="w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 flex items-center justify-center">
+              {section.isVideo ? (
+                <video
+                  src={section.image}
+                  className="w-full h-full object-cover rounded-xl border-2 border-white shadow-2xl"
+                  style={{
+                    borderColor: focusedSection === idx ? '#fbbf24' : '#ffffff',
+                    borderWidth: focusedSection === idx ? '4px' : '2px',
+                    boxShadow: focusedSection === idx 
+                      ? '0 25px 50px -12px rgba(251, 191, 36, 0.5)' 
+                      : '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                  }}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                />
+              ) : (
+                <img
+                  src={section.image}
+                  alt={section.alt}
+                  className="w-full h-full object-cover rounded-xl border-2 border-white shadow-2xl"
+                  style={{
+                    borderColor: focusedSection === idx ? '#fbbf24' : '#ffffff',
+                    borderWidth: focusedSection === idx ? '4px' : '2px',
+                    boxShadow: focusedSection === idx 
+                      ? '0 25px 50px -12px rgba(251, 191, 36, 0.5)' 
+                      : '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                  }}
+                />
+              )}
+            </div>
+            <span 
+              className="mt-3 sm:mt-4 text-base sm:text-lg md:text-xl font-semibold transition-all duration-500"
+              style={{
+                color: focusedSection === idx ? '#fbbf24' : '#ffffff90',
+                fontSize: focusedSection === idx ? 'clamp(1.1rem, 2.5vw, 1.25rem)' : 'clamp(1rem, 2vw, 1.125rem)',
+                fontWeight: focusedSection === idx ? '700' : '600'
+              }}
+            >
+              {section.title}
+            </span>
+          </div>
+        ))}
+      </div>
+        </section>
+  );
+}
 
 export default function EurusStudioPage() {
   const toolImages = [
-    { label: 'Video', image: '/images/topvideo.mp4', isVideo: true },
+    { label: 'Video', image: '/videos/topvideofinal.mp4', isVideo: true },
     { label: 'Image', image: '/images/topcrop.png' },
     { label: 'Extend', image: '/images/topbg.jpeg' },
     { label: 'Invert', image: '/images/topinvert.png' },
-    { label: 'Image Describer', image: '/images/top.jpg', hasTextOverlay: true },
-    { label: 'Paint', image: '/images/toppaint.png' },
+    { label: 'Image Describer', image: '/images/topbg.jpeg', hasTextOverlay: true },
+    { label: 'Paint', image: '/images/topblue.png' },
     { label: 'Depth Extractor', image: '/images/topz.png' },
     { label: '3D', image: '/images/top3D.glb', is3D: true },
     { label: 'LUT', image: '/images/toplut.jpeg' },
   ];
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
-  const [activeImage, setActiveImage] = useState('/images/topvideo.mp4');
-  const [imageLoaded, setImageLoaded] = useState(true);
+  const [activeImage, setActiveImage] = useState('/videos/topvideofinal.mp4');
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [is3D, setIs3D] = useState(false);
   const [scrollAccumulator, setScrollAccumulator] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+  const [modalContent, setModalContent] = useState<any>(null);
   function handleNextImage() {
     const nextIdx = (currentImageIdx + 1) % toolImages.length;
     setCurrentImageIdx(nextIdx);
@@ -104,61 +365,34 @@ export default function EurusStudioPage() {
 
         {/* Section: Every Model. Perfectly In Sync. */}
         <section className="w-screen h-screen relative overflow-hidden flex items-stretch scroll-snap-section" id="explore">
-          <ProductsScrollSectionStudio />
+          <ProductsScrollSectionStudioLanding />
         </section>
 
-        {/* Section: With all the professional tools you rely on */}
-        <section className="w-screen h-screen flex items-center justify-center bg-black font-sf-pro relative" style={{ fontFamily: 'Inter, SF Pro, sans-serif' }}>
-          {/* Full screen media with overlay text and side options */}
-          <div
-            className="relative w-full h-full flex items-center justify-center overflow-hidden bg-black group"
-            onWheel={(e) => {
-              // Handle both horizontal and vertical scrolling with threshold
-              e.preventDefault();
-              const scrollDelta = e.deltaY + e.deltaX;
-              const newAccumulator = scrollAccumulator + scrollDelta;
-              const threshold = 150; // Require more scrolling to trigger change
-              
-              if (Math.abs(newAccumulator) >= threshold) {
-                const direction = newAccumulator > 0 ? 1 : -1;
-                const nextIdx = direction > 0 
-                  ? (currentImageIdx + 1) % toolImages.length
-                  : currentImageIdx === 0 ? toolImages.length - 1 : currentImageIdx - 1;
-                setCurrentImageIdx(nextIdx);
-                setActiveImage(toolImages[nextIdx].image);
-                setImageLoaded(true);
-                setScrollAccumulator(0); // Reset accumulator after change
-              } else {
-                setScrollAccumulator(newAccumulator);
-              }
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'ArrowLeft') {
-                e.preventDefault();
-                const prevIdx = currentImageIdx === 0 ? toolImages.length - 1 : currentImageIdx - 1;
-                setCurrentImageIdx(prevIdx);
-                setActiveImage(toolImages[prevIdx].image);
-                setImageLoaded(true);
-              } else if (e.key === 'ArrowRight') {
-                e.preventDefault();
-                const nextIdx = (currentImageIdx + 1) % toolImages.length;
-                setCurrentImageIdx(nextIdx);
-                setActiveImage(toolImages[nextIdx].image);
-                setImageLoaded(true);
-              }
-            }}
-            tabIndex={0}
-            style={{ outline: 'none' }}
-          >
-              <div className="w-full h-full relative overflow-hidden z-10">
-                {toolImages[currentImageIdx].is3D ? (
-                  <div 
-                    key={`3d-${currentImageIdx}-${activeImage}`}
-                    className="absolute inset-0 w-full h-full flex items-center justify-center"
-                    style={{ 
-                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards'
-                    }}
-                  >
+        {/* Section: With all the professional tools you rely on - Grid View */}
+        <section className="w-screen h-screen bg-black font-sf-pro relative" style={{ fontFamily: 'Inter, SF Pro, sans-serif' }}>
+          <div className="w-full h-full flex flex-col justify-center p-2">
+            {/* Title text overlay - TOP CENTER */}
+            <div className="text-center mb-3 z-20">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold mb-1 leading-tight text-white" style={{ letterSpacing: '-0.01em', fontFamily: 'var(--font-sf-pro)' }}>
+                All the tools you trust.<br />Now in one flow.
+              </h2>
+              <p className="text-sm sm:text-base md:text-lg font-light text-white/90" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+                From cropping to relighting—designed for flow.
+              </p>
+            </div>
+
+            {/* Grid Layout */}
+            <div className="w-full h-[65vh] grid grid-cols-4 grid-rows-3 gap-1 relative">
+              {/* Center large video area - spans 2x2 */}
+              <div className="col-start-2 col-span-2 row-start-1 row-span-2 relative">
+                <div 
+                  className="w-full h-full bg-gray-900 rounded-lg overflow-hidden border-2 border-white/20 cursor-pointer transition-all duration-300 hover:border-white/40 hover:shadow-2xl hover:shadow-white/20"
+                  onClick={() => {
+                    setModalContent(toolImages[currentImageIdx]);
+                    setShowModal(true);
+                  }}
+                >
+                  {toolImages[currentImageIdx].is3D ? (
                     <div className="w-full h-full">
                       <Canvas 
                         camera={{ 
@@ -182,145 +416,212 @@ export default function EurusStudioPage() {
                         />
                       </Canvas>
                     </div>
-                  </div>
-                ) : toolImages[currentImageIdx].isVideo ? (
-                  <div 
-                    key={`video-${currentImageIdx}-${activeImage}`}
-                    className="w-full h-full flex items-center justify-center relative"
-                    style={{ 
-                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards'
-                    }}
-                  >
-                    <video
-                      key={activeImage}
-                      src={activeImage}
-                      className="w-full h-full object-cover"
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      onLoadedData={() => setImageLoaded(true)}
-                      onError={() => setImageLoaded(true)}
-                    />
-                  </div>
-                ) : (
-                  <div 
-                    key={`image-${currentImageIdx}-${activeImage}`}
-                    className={`w-full h-full flex items-center justify-center relative ${
-                      toolImages[currentImageIdx].label === 'Image' ? 'bg-black' : ''
-                    }`}
-                    style={{ 
-                      animation: 'pullInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards'
-                    }}
-                  >
+                  ) : toolImages[currentImageIdx].isVideo ? (
+                    <div className="w-full h-full relative bg-gray-900 flex items-center justify-center">
+                      <video
+                        key={activeImage}
+                        src={activeImage}
+                        className="w-full h-full object-cover"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        preload="auto"
+                        onLoadedData={() => {
+                          console.log('Video loaded successfully:', activeImage);
+                          setImageLoaded(true);
+                        }}
+                        onError={(e) => {
+                          console.error('Video failed to load:', activeImage, e);
+                          setImageLoaded(true);
+                        }}
+                        onLoadStart={() => {
+                          console.log('Video loading started:', activeImage);
+                        }}
+                        onCanPlay={() => {
+                          console.log('Video can start playing:', activeImage);
+                        }}
+                      />
+
+                    </div>
+                  ) : (
                     <img
                       key={activeImage}
                       src={activeImage}
                       alt={toolImages[currentImageIdx].label}
-                      className={`${
-                        toolImages[currentImageIdx].label === 'Image' 
-                          ? 'max-w-full max-h-full object-contain' 
-                          : 'w-full h-full object-cover'
-                      }`}
+                      className="w-full h-full object-cover"
                       onLoad={() => setImageLoaded(true)}
                       onError={() => setImageLoaded(true)}
                     />
+                  )}
+                </div>
+                {/* Tool name overlay for center */}
+                <div className="absolute bottom-4 left-4 z-10">
+                  <h3 className="text-xl font-bold text-white drop-shadow-lg" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+                    {toolImages[currentImageIdx].label}
+                  </h3>
+                </div>
+              </div>
 
+              {/* Grid items around the center */}
+              {toolImages.map((tool, idx) => {
+                // Skip the currently selected tool as it's shown in center
+                if (idx === currentImageIdx) return null;
+                
+                // Calculate grid position
+                let gridClass = '';
+                if (idx === 0) gridClass = 'col-start-1 row-start-1';
+                else if (idx === 1) gridClass = 'col-start-4 row-start-1';
+                else if (idx === 2) gridClass = 'col-start-1 row-start-2';
+                else if (idx === 3) gridClass = 'col-start-4 row-start-2';
+                else if (idx === 4) gridClass = 'col-start-1 row-start-3';
+                else if (idx === 5) gridClass = 'col-start-2 row-start-3';
+                else if (idx === 6) gridClass = 'col-start-3 row-start-3';
+                else if (idx === 7) gridClass = 'col-start-4 row-start-3';
+
+                return (
+                  <div
+                    key={idx}
+                    className={`${gridClass} cursor-pointer transition-all duration-300 hover:z-10`}
+                    onClick={() => {
+                      setCurrentImageIdx(idx);
+                      setActiveImage(tool.image);
+                      setImageLoaded(true);
+                    }}
+                  >
+                    <div className="w-full h-full bg-gray-800 rounded-lg overflow-hidden border border-white/10 hover:border-white/50 hover:shadow-2xl hover:shadow-white/20 relative transition-all duration-300">
+                      {tool.is3D ? (
+                        <div className="w-full h-full bg-gray-700 relative">
+                          <Canvas 
+                            camera={{ 
+                              position: [0, 0, 2.8],
+                              fov: 50
+                            }} 
+                            className="w-full h-full" 
+                            style={{ background: '#374151' }}
+                          >
+                            <ambientLight intensity={0.8} />
+                            <directionalLight position={[2, 4, 2]} intensity={1} />
+                            <Model3D url={tool.image} />
+                          </Canvas>
+                        </div>
+                      ) : tool.isVideo ? (
+                        <video
+                          src={tool.image}
+                          className="w-full h-full object-cover"
+                          muted
+                          loop
+                          playsInline
+                        />
+                      ) : (
+                        <img
+                          src={tool.image}
+                          alt={tool.label}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                      {/* Tool name overlay */}
+                      <div className="absolute bottom-2 left-2">
+                        <span className="text-xs font-medium text-white drop-shadow-lg" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+                          {tool.label}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                )}
-              </div>
-              
-              {/* Title text overlay - CENTER TOP */}
-              <div className="absolute top-8 left-0 right-0 flex justify-center pointer-events-none z-50">
-                <div className="text-center">
-                  <h2 className={`text-5xl md:text-7xl font-bold mb-2 leading-tight ${
-                    ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black'
-                  }`} style={{ letterSpacing: '-0.01em', fontFamily: 'var(--font-sf-pro)' }}>
-                    All the tools you trust.<br />Now in one flow.
-                  </h2>
-                  <p className={`text-base md:text-lg font-light ${
-                    ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white/90' : 'text-black/80'
-                  }`} style={{ fontFamily: 'var(--font-sf-pro)' }}>
-                    From cropping to relighting—designed for flow.
-                  </p>
-                </div>
-              </div>
-
-              {/* Current tool name overlay - BOTTOM CENTER */}
-              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 pointer-events-none z-50">
-                <h3 className={`text-2xl md:text-3xl font-bold ${
-                  ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black'
-                }`} style={{ fontFamily: 'var(--font-sf-pro)', textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}>
-                  {toolImages[currentImageIdx].label}
-                </h3>
-              </div>
-
-              {/* Image description for Image Describer */}
-              {toolImages[currentImageIdx].hasTextOverlay && (
-                <div className="absolute right-0 top-0 h-full flex items-center pointer-events-none z-30">
-                  <div className="text-right max-w-md pr-8">
-                    <p className={`text-lg md:text-xl font-medium leading-relaxed ${
-                      ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) ? 'text-white' : 'text-black'
-                    }`} style={{ fontFamily: 'var(--font-sf-pro)' }}>
-                      The image shows a beautifully crafted wooden spinning top placed upright on a flat, textured surface. The top is made of polished wood with rich, natural grain patterns and a warm, amber-brown hue.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Navigation arrows for switching tools - no button styling */}
-              <div
-                onClick={() => {
-                  const prevIdx = currentImageIdx === 0 ? toolImages.length - 1 : currentImageIdx - 1;
-                  setCurrentImageIdx(prevIdx);
-                  setActiveImage(toolImages[prevIdx].image);
-                  setImageLoaded(true);
-                }}
-                className={`absolute left-4 top-1/2 -translate-y-1/2 z-50 cursor-pointer transition-all duration-200 ${
-                  ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) 
-                    ? 'text-white hover:text-white/70' 
-                    : 'text-black hover:text-black/70'
-                }`}
-                style={{ pointerEvents: 'auto' }}
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              
-              <div
-                onClick={() => {
-                  const nextIdx = (currentImageIdx + 1) % toolImages.length;
-                  setCurrentImageIdx(nextIdx);
-                  setActiveImage(toolImages[nextIdx].image);
-                  setImageLoaded(true);
-                }}
-                className={`absolute right-4 top-1/2 -translate-y-1/2 z-50 cursor-pointer transition-all duration-200 ${
-                  ['Image', '3D', 'Depth Extractor'].includes(toolImages[currentImageIdx].label) 
-                    ? 'text-white hover:text-white/70' 
-                    : 'text-black hover:text-black/70'
-                }`}
-                style={{ pointerEvents: 'auto' }}
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              
-              {!imageLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center text-white/60 bg-black/60">
-                  Loading…
-                </div>
-              )}
+                );
+              })}
             </div>
+
+          </div>
+
+          {/* Modal Overlay */}
+          {showModal && modalContent && (
+            <div 
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setShowModal(false)}
+            >
+              <div 
+                className="bg-black rounded-lg overflow-hidden relative border border-white/20"
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  width: modalContent.isVideo || !modalContent.is3D ? 'auto' : '800px',
+                  maxWidth: '90vw',
+                  maxHeight: '90vh'
+                }}
+              >
+                {/* Close button */}
+                <button 
+                  onClick={() => setShowModal(false)}
+                  className="absolute top-4 right-4 text-white/60 hover:text-white text-2xl z-10 bg-black/50 rounded-full w-8 h-8 flex items-center justify-center"
+                >
+                  ×
+                </button>
+                
+                {/* Modal content */}
+                <div className="relative">
+                  {modalContent.is3D ? (
+                    <div style={{ width: '800px', height: '600px' }}>
+                      <Canvas 
+                        camera={{ 
+                          position: [0, 0, 2.8],
+                          fov: 50
+                        }} 
+                        className="w-full h-full" 
+                        style={{ background: '#000' }}
+                      >
+                        <ambientLight intensity={1.2} />
+                        <directionalLight position={[2, 4, 2]} intensity={1.5} castShadow />
+                        <Environment preset="city" />
+                        <Model3D url={modalContent.image} />
+                        <OrbitControls 
+                          enableZoom={true}
+                          enablePan={true}
+                          enableRotate={true}
+                          autoRotate={false}
+                          rotateSpeed={1}
+                          target={[0, 0, 0]}
+                        />
+                      </Canvas>
+                    </div>
+                  ) : modalContent.isVideo ? (
+                    <video
+                      src={modalContent.image}
+                      className="block"
+                      style={{ maxWidth: '90vw', maxHeight: '90vh', width: 'auto', height: 'auto' }}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      controls
+                    />
+                  ) : (
+                    <img
+                      src={modalContent.image}
+                      alt={modalContent.label}
+                      className="block"
+                      style={{ maxWidth: '90vw', maxHeight: '90vh', width: 'auto', height: 'auto' }}
+                    />
+                  )}
+                </div>
+                
+                {/* Tool info overlay */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                  <h3 className="text-xl font-bold text-white mb-1" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+                    {modalContent.label}
+                  </h3>
+                  {modalContent.hasTextOverlay && (
+                    <p className="text-sm text-white/80 leading-relaxed" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+                      The image shows a beautifully crafted wooden spinning top placed upright on a flat, textured surface.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </section>
 
-        {/* Section: Control the Outcome */}
-        {/* Layered Visual Placeholder: Placeholder for multiple layered images */}
-        <IdeasScrollNodesSection />
-
-        {/* New Scroll Section - Similar to Eurus Labs page */}
-        <ProductsScrollSectionStudioLanding />
+        {/* Section: Ideas don't wait. Neither should you. - Scroll-hijacking section */}
+        <IdeasScrollSection />
       </main>
     </div>
   )
@@ -544,13 +845,13 @@ function ProductsScrollSectionStudioLanding() {
     },
     {
       name: "Rodin",
-      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person2.mp4",
+      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person3.mp4",
       description: "Rodin brings next-gen 3D generation and modeling to creators.",
       link: "https://rodin.ai/",
     },
     {
       name: "Veo 3",
-      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person3.mp4",
+      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/peron2.mp4",
       description: "Veo 3 is a powerful AI for video understanding and creative editing.",
       link: "https://deepmind.google/technologies/veo/",
     },
@@ -562,7 +863,7 @@ function ProductsScrollSectionStudioLanding() {
     },
     {
       name: "Luma ray 2",
-      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/person5.mp4",
+      videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/peron5.mp4",
       description: "Luma ray 2 delivers photorealistic 3D and lighting effects with AI.",
       link: "https://lumalabs.ai/",
     },
@@ -794,8 +1095,16 @@ function ProductsScrollSectionStudioLanding() {
       ))}
       <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
       
+      {/* Left side text overlay */}
+      <div className="absolute left-4 sm:left-6 md:left-8 lg:left-10 top-1/2 -translate-y-1/2 z-20 pointer-events-none max-w-[60%] sm:max-w-none">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white drop-shadow-lg leading-tight mb-4" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+          Every Model.<br />One Platform.
+        </h2>
+        <p className="text-sm sm:text-base md:text-lg font-medium text-white/80 drop-shadow-md" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+          30+ models in one canvas
+        </p>
+      </div>
 
-      
       {/* Right side product names */}
       <div className="absolute right-4 sm:right-6 md:right-8 lg:right-10 top-1/2 -translate-y-1/2 flex flex-col items-end gap-1 sm:gap-2 md:gap-3 z-20 pointer-events-none max-w-[35%] sm:max-w-none">
         {products.map((p, i) => (
@@ -867,45 +1176,45 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
     const isDesktop = window.innerWidth >= 1024;
     
     if (isMobile) {
-      // Mobile: Smaller nodes, vertical layout
+      // Mobile: Smaller nodes, vertical layout - increased by 20% again
       const startX = 20;
       const startY = 200;
-      const nodeWidth = 120;
-      const nodeHeight = 60;
+      const nodeWidth = 191; // 159 * 1.20 (20% increase)
+      const nodeHeight = 95; // 79 * 1.20 (20% increase)
       
       return {
         canvasWidth: window.innerWidth - 40,
         canvasHeight: 600,
         nodes: [
-          { id: 5, x: startX, y: startY, w: nodeWidth + 20, h: nodeHeight, type: 'text', label: 'Text' },
-          { id: 2, x: startX + nodeWidth + 40, y: startY, w: nodeWidth, h: nodeHeight, type: 'lut', label: 'LUT' },
-          { id: 3, x: startX + 30, y: startY + 100, w: nodeWidth, h: nodeHeight + 20, type: 'image', label: 'Image' },
-          { id: 6, x: startX + nodeWidth + 50, y: startY + 100, w: nodeWidth, h: nodeHeight + 20, type: 'image2', label: 'Image 2' },
-          { id: 1, x: startX + 20, y: startY + 220, w: nodeWidth + 20, h: nodeHeight + 40, type: '3dimage', label: '3D' },
-          { id: 4, x: startX + nodeWidth + 60, y: startY + 220, w: nodeWidth + 20, h: nodeHeight + 40, type: 'video', label: 'Video' },
+          { id: 5, x: startX, y: startY, w: nodeWidth + 31, h: nodeHeight, type: 'text', label: 'Text' }, // 26 * 1.20 = 31
+          { id: 2, x: startX + nodeWidth + 64, y: startY, w: nodeWidth, h: nodeHeight, type: 'lut', label: 'LUT' }, // 53 * 1.20 = 64
+          { id: 3, x: startX + 48, y: startY + 100, w: nodeWidth, h: nodeHeight + 31, type: 'image', label: 'Image' }, // 40 * 1.20 = 48, 26 * 1.20 = 31
+          { id: 6, x: startX + nodeWidth + 80, y: startY + 100, w: nodeWidth, h: nodeHeight + 31, type: 'image2', label: 'Image 2' }, // 67 * 1.20 = 80
+          { id: 1, x: startX + 31, y: startY + 220, w: nodeWidth + 31, h: nodeHeight + 64, type: '3dimage', label: '3D' }, // 26 * 1.20 = 31, 53 * 1.20 = 64
+          { id: 4, x: startX + nodeWidth + 95, y: startY + 220, w: nodeWidth + 31, h: nodeHeight + 64, type: 'video', label: 'Video' }, // 79 * 1.20 = 95
         ]
       };
     } else if (isTablet) {
-      // Tablet: Medium-sized nodes
+      // Tablet: Medium-sized nodes - increased by 20% again
       const startX = 60;
       const startY = 220;
-      const nodeWidth = 140;
-      const nodeHeight = 70;
+      const nodeWidth = 222; // 185 * 1.20 (20% increase)
+      const nodeHeight = 112; // 93 * 1.20 (20% increase)
       
       return {
         canvasWidth: window.innerWidth - 120,
         canvasHeight: 500,
         nodes: [
-          { id: 5, x: startX, y: startY, w: nodeWidth + 20, h: nodeHeight, type: 'text', label: 'Text' },
-          { id: 2, x: startX + 180, y: startY, w: nodeWidth, h: nodeHeight, type: 'lut', label: 'LUT' },
-          { id: 3, x: startX + 340, y: startY, w: nodeWidth, h: nodeHeight + 20, type: 'image', label: 'Image' },
-          { id: 6, x: startX + 500, y: startY, w: nodeWidth, h: nodeHeight + 20, type: 'image2', label: 'Image 2' },
-          { id: 1, x: startX + 120, y: startY + 150, w: nodeWidth + 40, h: nodeHeight + 50, type: '3dimage', label: '3D' },
-          { id: 4, x: startX + 320, y: startY + 150, w: nodeWidth + 40, h: nodeHeight + 50, type: 'video', label: 'Video' },
+          { id: 5, x: startX, y: startY, w: nodeWidth + 31, h: nodeHeight, type: 'text', label: 'Text' }, // 26 * 1.20 = 31
+          { id: 2, x: startX + 286, y: startY, w: nodeWidth, h: nodeHeight, type: 'lut', label: 'LUT' }, // 238 * 1.20 = 286
+          { id: 3, x: startX + 540, y: startY, w: nodeWidth, h: nodeHeight + 31, type: 'image', label: 'Image' }, // 450 * 1.20 = 540, 26 * 1.20 = 31
+          { id: 6, x: startX + 793, y: startY, w: nodeWidth, h: nodeHeight + 31, type: 'image2', label: 'Image 2' }, // 661 * 1.20 = 793
+          { id: 1, x: startX + 191, y: startY + 239, w: nodeWidth + 64, h: nodeHeight + 80, type: '3dimage', label: '3D' }, // 159 * 1.20 = 191, 199 * 1.20 = 239, 53 * 1.20 = 64, 67 * 1.20 = 80
+          { id: 4, x: startX + 508, y: startY + 239, w: nodeWidth + 64, h: nodeHeight + 80, type: 'video', label: 'Video' }, // 423 * 1.20 = 508
         ]
       };
     } else {
-      // Desktop: Original large nodes
+      // Desktop: Original large nodes - increased by 20% again
       const startX = 100;
       const startY = 280;
       
@@ -913,12 +1222,12 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
         canvasWidth: 1200,
         canvasHeight: 500,
         nodes: [
-          { id: 5, x: startX, y: startY, w: 180, h: 80, type: 'text', label: 'Text' },
-          { id: 2, x: startX + 220, y: startY, w: 160, h: 80, type: 'lut', label: 'LUT' },
-          { id: 3, x: startX + 420, y: startY, w: 180, h: 120, type: 'image', label: 'Image' },
-          { id: 6, x: startX + 640, y: startY, w: 180, h: 120, type: 'image2', label: 'Image 2' },
-          { id: 1, x: startX + 160, y: startY + 180, w: 240, h: 140, type: '3dimage', label: '3D' },
-          { id: 4, x: startX + 440, y: startY + 180, w: 240, h: 140, type: 'video', label: 'Video' },
+          { id: 5, x: startX, y: startY, w: 286, h: 127, type: 'text', label: 'Text' }, // 238 * 1.20 = 286, 106 * 1.20 = 127
+          { id: 2, x: startX + 349, y: startY, w: 254, h: 127, type: 'lut', label: 'LUT' }, // 291 * 1.20 = 349, 212 * 1.20 = 254
+          { id: 3, x: startX + 666, y: startY, w: 286, h: 191, type: 'image', label: 'Image' }, // 555 * 1.20 = 666, 238 * 1.20 = 286, 159 * 1.20 = 191
+          { id: 6, x: startX + 1016, y: startY, w: 286, h: 191, type: 'image2', label: 'Image 2' }, // 847 * 1.20 = 1016
+          { id: 1, x: startX + 254, y: startY + 286, w: 380, h: 222, type: '3dimage', label: '3D' }, // 212 * 1.20 = 254, 238 * 1.20 = 286, 317 * 1.20 = 380, 185 * 1.20 = 222
+          { id: 4, x: startX + 698, y: startY + 286, w: 380, h: 222, type: 'video', label: 'Video' }, // 582 * 1.20 = 698
         ]
       };
     }
@@ -1212,8 +1521,10 @@ function DraggableNodesLayer({ onNodeAction }: { onNodeAction: (action: string) 
             // Add more mappings as needed
           }}
         >
-          {/* Label above node - Mobile Responsive */}
-          <span className="mb-1 text-xs sm:text-sm font-semibold text-white dark:text-white bg-black/60 dark:bg-black/80 px-2 py-0.5 rounded select-none" style={{ marginBottom: 2 }}>{node.label}</span>
+          {/* Label above node - Mobile Responsive (hidden for LUT) */}
+          {node.type !== 'lut' && (
+            <span className="mb-1 text-xs sm:text-sm font-semibold text-white dark:text-white bg-black/60 dark:bg-black/80 px-2 py-0.5 rounded select-none" style={{ marginBottom: 2 }}>{node.label}</span>
+          )}
           {/* Node content */}
           <div
             className={`w-full h-full bg-white/80 dark:bg-black/80 border border-gray-300 dark:border-gray-700 shadow-md flex items-center justify-center select-none cursor-move relative ${node.type === 'video' ? 'rounded-lg' : 'rounded-xl'}${draggingId === node.id ? ' shadow-2xl scale-105' : ''}`}

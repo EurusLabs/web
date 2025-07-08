@@ -6,51 +6,174 @@ export default function IdeasScrollNodesSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = React.useState(0);
   const [focusedSection, setFocusedSection] = React.useState(0); // 0 = Inspire, 1 = Refine, 2 = Craft
+  const [isScrollLocked, setIsScrollLocked] = React.useState(false);
+  const [hasCompletedSequence, setHasCompletedSequence] = React.useState(false);
+  const [wheelAccumulator, setWheelAccumulator] = React.useState(0);
+  const isTransitioning = React.useRef(false);
+  const touchStartY = React.useRef(0);
+  const touchAccumulator = React.useRef(0);
 
   React.useEffect(() => {
     function onScroll() {
       if (!sectionRef.current) return;
       const rect = sectionRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-      const sectionHeight = rect.height;
       const sectionTop = rect.top;
       const sectionBottom = rect.bottom;
       
-      // Calculate scroll progress through the section
-      if (sectionTop < windowHeight && sectionBottom > 0) {
-        // Simple progress calculation
-        const progress = Math.max(0, Math.min(1, (windowHeight - sectionTop) / (sectionHeight + windowHeight)));
-        setProgress(progress);
+      // Check if section is in viewport
+      const isInViewport = sectionTop < windowHeight && sectionBottom > 0;
+      
+      // More precise viewport detection - section should be prominently visible
+      const isProminentlyVisible = sectionTop < windowHeight * 0.5 && sectionBottom > windowHeight * 0.5;
+      
+      if (isProminentlyVisible && !hasCompletedSequence) {
+        // Section is prominently in view and sequence hasn't completed - lock scrolling
+        setIsScrollLocked(true);
+      } else if (!isProminentlyVisible || hasCompletedSequence) {
+        // Section is not prominently visible or sequence completed - unlock scrolling
+        setIsScrollLocked(false);
         
-                 // BALANCED approach: Ensure all three sections get proper highlighting
-         if (sectionTop > windowHeight * 0.1) {
-           // Section is just entering viewport - ALWAYS show Inspire
-           setFocusedSection(0);
-         } else {
-           // Section is well into viewport - balanced progress-based logic
-           if (progress < 0.45) {
-             setFocusedSection(0); // Inspire - good initial range
-           } else if (progress < 0.75) {
-             setFocusedSection(1); // Refine - middle range
-           } else {
-             setFocusedSection(2); // Craft - final range (lowered from 88% to 75%)
-           }
-         }
-      } else if (sectionTop >= windowHeight) {
-        // Section is below viewport
-        setProgress(0);
-        setFocusedSection(0); // Default to Inspire
-      } else if (sectionBottom <= 0) {
-        // Section is above viewport
-        setProgress(1);
-        setFocusedSection(2); // Default to Craft when fully scrolled
+        // Reset sequence if we've scrolled away from the section
+        if (!isInViewport && hasCompletedSequence) {
+          setHasCompletedSequence(false);
+          setFocusedSection(0);
+        }
+      }
+    }
+
+    function handleTransition(direction: number) {
+      if (direction > 0) {
+        // Scrolling down
+        if (focusedSection < 2) {
+          isTransitioning.current = true;
+          setFocusedSection(prev => prev + 1);
+          
+          // Clear transition flag after animation
+          setTimeout(() => {
+            isTransitioning.current = false;
+          }, 700); // Match transition duration
+        } else if (focusedSection === 2) {
+          // We're at Craft and user is scrolling down - complete sequence and unlock
+          setTimeout(() => {
+            setHasCompletedSequence(true);
+            setIsScrollLocked(false);
+          }, 300); // Small delay before allowing scroll
+        }
+      } else {
+        // Scrolling up
+        if (focusedSection > 0) {
+          isTransitioning.current = true;
+          setFocusedSection(prev => prev - 1);
+          
+          // Clear transition flag after animation
+          setTimeout(() => {
+            isTransitioning.current = false;
+          }, 700);
+        }
+      }
+    }
+
+    function onWheel(e: WheelEvent) {
+      if (!sectionRef.current || !isScrollLocked) return;
+      
+      // Prevent default scrolling when section is locked
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Don't process wheel events during transitions
+      if (isTransitioning.current) return;
+      
+      // Accumulate wheel delta for more precise control
+      const newAccumulator = wheelAccumulator + e.deltaY;
+      setWheelAccumulator(newAccumulator);
+      
+      // Threshold for triggering transitions (adjust for sensitivity)
+      const threshold = 80; // Slightly more sensitive
+      
+      if (Math.abs(newAccumulator) > threshold) {
+        const direction = newAccumulator > 0 ? 1 : -1;
+        
+        // Reset accumulator
+        setWheelAccumulator(0);
+        
+        // Handle transitions
+        handleTransition(direction);
+      }
+    }
+
+    function onTouchStart(e: TouchEvent) {
+      if (!sectionRef.current || !isScrollLocked) return;
+      touchStartY.current = e.touches[0].clientY;
+      touchAccumulator.current = 0;
+    }
+
+    function onTouchMove(e: TouchEvent) {
+      if (!sectionRef.current || !isScrollLocked) return;
+      
+      // Prevent default scrolling when section is locked
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Don't process touch events during transitions
+      if (isTransitioning.current) return;
+      
+      const currentY = e.touches[0].clientY;
+      const deltaY = touchStartY.current - currentY;
+      touchAccumulator.current += deltaY;
+      touchStartY.current = currentY;
+      
+      // Threshold for triggering transitions on touch
+      const threshold = 40; // More sensitive for touch
+      
+      if (Math.abs(touchAccumulator.current) > threshold) {
+        const direction = touchAccumulator.current > 0 ? 1 : -1;
+        
+        // Reset accumulator
+        touchAccumulator.current = 0;
+        
+        // Handle transitions
+        handleTransition(direction);
+      }
+    }
+
+    function onTouchEnd(e: TouchEvent) {
+      if (!sectionRef.current || !isScrollLocked) return;
+      touchAccumulator.current = 0;
+    }
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (!sectionRef.current || !isScrollLocked) return;
+      
+      // Don't process key events during transitions
+      if (isTransitioning.current) return;
+      
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        handleTransition(1);
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        handleTransition(-1);
       }
     }
     
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('touchstart', onTouchStart, { passive: false });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd, { passive: false });
+    window.addEventListener('keydown', onKeyDown, { passive: false });
     onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isScrollLocked, hasCompletedSequence, wheelAccumulator, focusedSection]);
 
   const sections = [
     {
@@ -79,10 +202,29 @@ export default function IdeasScrollNodesSection() {
   return (
     <section
       ref={sectionRef}
-      className="w-screen bg-black flex flex-col items-center justify-center p-0 m-0"
+      className="w-screen bg-black flex flex-col items-center justify-center p-0 m-0 relative"
       style={{ minHeight: '100vh', padding: '2rem 0', margin: 0 }}
     >
-      <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 sm:mb-8 mt-0 text-center text-white px-4" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+      {/* Scroll indicator */}
+      {isScrollLocked && (
+        <div className="fixed top-1/2 right-8 transform -translate-y-1/2 z-50 flex flex-col items-center space-y-2">
+          <div className="text-white/60 text-sm font-medium" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+            Scroll to explore
+          </div>
+          <div className="flex flex-col space-y-1">
+            {[0, 1, 2].map((idx) => (
+              <div
+                key={idx}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  focusedSection === idx ? 'bg-yellow-400' : 'bg-white/30'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+      
+      <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 sm:mb-8 md:mb-10 leading-tight text-center" style={{ fontFamily: 'var(--font-sf-pro)' }}>
         Ideas don't wait. Neither should you.
       </h2>
       <div className="relative w-full flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 md:gap-8 h-auto sm:h-[60vh] px-4 sm:px-6 md:px-8">
