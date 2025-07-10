@@ -9,6 +9,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Serve all /public assets from Azure Blob Storage
+  assetPrefix: 'https://eurusworkflows.blob.core.windows.net/eurusworkflows',
   // Only enable static export for production builds
   ...(process.env.NODE_ENV === 'production' && {
     output: 'export',
