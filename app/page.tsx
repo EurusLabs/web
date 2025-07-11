@@ -151,41 +151,11 @@ function HomePage() {
     }, 2000)
   }
 
-  // Add throttle function before the component
-  const throttle = (func: Function, limit: number) => {
-    let inThrottle: boolean
-    return function (this: any, ...args: any[]) {
-      if (!inThrottle) {
-        func.apply(this, args)
-        inThrottle = true
-        setTimeout(() => (inThrottle = false), limit)
-      }
-    }
-  }
+  // --- requestAnimationFrame-based mouse tracking ---
+  const latestMouse = useRef<{ x: number; y: number } | null>(null)
+  const rafId = useRef<number | null>(null)
 
-  // Update the handleMouseMove function with throttling and smoother transitions
-  const handleMouseMove = useCallback(
-    throttle((e: React.MouseEvent<HTMLDivElement>) => {
-      const newPosition = { x: e.clientX, y: e.clientY }
-      setMousePosition(newPosition)
-
-      // Calculate new blob properties based on mouse position
-      const blobProps = calculateBlobProperties(newPosition.x, newPosition.y)
-      setBlobSize({ width: blobProps.width, height: blobProps.height })
-      setBlobVariation(blobProps.variation)
-    }, 16), // 60fps throttling
-    [],
-  )
-
-  const handleMouseEnter = () => {
-    setIsHovering(true)
-  }
-
-  const handleMouseLeave = () => {
-    setIsHovering(false)
-  }
-
-  // Add this function to calculate dynamic blob size and shape based on mouse position
+  // Calculate blob properties (existing function)
   const calculateBlobProperties = useCallback((x: number, y: number) => {
     // Use mouse position to determine size (with some randomness)
     const screenWidth = window.innerWidth
@@ -240,6 +210,38 @@ function HomePage() {
     }
   }, [])
 
+  // Animation frame update for mouse tracking
+  const updateMouse = useCallback(() => {
+    if (latestMouse.current) {
+      setMousePosition(latestMouse.current)
+      const blobProps = calculateBlobProperties(latestMouse.current.x, latestMouse.current.y)
+      setBlobSize({ width: blobProps.width, height: blobProps.height })
+      setBlobVariation(blobProps.variation)
+    }
+    rafId.current = null
+  }, [calculateBlobProperties])
+
+  // Fast mouse move handler using rAF
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const newPosition = { x: e.clientX, y: e.clientY }
+    setMousePosition(newPosition)
+    const blobProps = calculateBlobProperties(newPosition.x, newPosition.y)
+    setBlobSize({ width: blobProps.width, height: blobProps.height })
+    setBlobVariation(blobProps.variation)
+  }, [calculateBlobProperties])
+
+  useEffect(() => {
+    return () => {
+      if (rafId.current !== null) {
+        window.cancelAnimationFrame(rafId.current)
+      }
+    }
+  }, [])
+
+  // Remove isHovering logic entirely
+  // const handleMouseEnter = () => setIsHovering(true)
+  // const handleMouseLeave = () => setIsHovering(false)
+
   // --- Recently Out Tabs ---
   const tabCategories = ["All", "Research", "Blog", "Announcements", "Guides", "Updates"]
   const [activeTab, setActiveTab] = useState("All")
@@ -260,8 +262,8 @@ function HomePage() {
               className="absolute inset-0 w-full h-full"
               onClick={handleVideoClick}
               onMouseMove={handleMouseMove}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
             >
               {/* All Main Videos - Only current one visible */}
               {homeVideos.map((video, index) => (
@@ -287,15 +289,19 @@ function HomePage() {
             </div>
 
             {/* Cursor Blob Effect - Shows Next Video */}
-            {isHovering && !isBlobHidden && (
               <div
-                className={`fixed pointer-events-none z-50 blob-size-transition organic-blob ${blobVariation} transition-opacity duration-300`}
+              className={`fixed pointer-events-none z-50 organic-blob ${blobVariation} blob-instant`}
                 style={{
                   left: mousePosition.x - blobSize.width / 2,
                   top: mousePosition.y - blobSize.height / 2,
                   width: `${blobSize.width}px`,
                   height: `${blobSize.height}px`,
                   overflow: "hidden",
+                willChange: "transform, left, top, width, height",
+                transform: "translateZ(0)", // Force hardware acceleration
+                willChange: "transform, left, top, width, height",
+                transform: "translateZ(0)", // Force hardware acceleration
+                // Remove all transitions for instant follow
                 }}
               >
                 {/* Clip the next video to show only this portion */}
@@ -304,6 +310,8 @@ function HomePage() {
                   style={{
                     left: `${-mousePosition.x + blobSize.width / 2}px`,
                     top: `${-mousePosition.y + blobSize.height / 2}px`,
+                  willChange: "left, top",
+                  transform: "translateZ(0)", // Force hardware acceleration
                   }}
                 >
                   {/* All Blob Videos - Only next one visible */}
@@ -320,16 +328,18 @@ function HomePage() {
                       muted
                       loop
                       playsInline
-                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+                    className={`absolute inset-0 w-full h-full object-cover ${
                         index === nextVideoIndex ? "opacity-100" : "opacity-0"
                       }`}
+                    style={{
+                      transition: "none", // Remove video transition delays too
+                    }}
                     >
                       <source src={video} type="video/mp4" />
                     </video>
                   ))}
                 </div>
               </div>
-            )}
 
             {/* Overlay */}
             <div className="absolute inset-0 bg-black/30 pointer-events-none z-20" />

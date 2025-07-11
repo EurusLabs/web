@@ -445,3 +445,14 @@ img, video, canvas, audio, iframe, embed, object {
   z-index: 9999;
   will-change: transform;
 }
+
+/* Instant blob following - no transitions */
+.blob-instant {
+  transition: none !important;
+  will-change: transform, left, top, width, height !important;
+  transform: translateZ(0) !important; /* Force hardware acceleration */
+}
+
+.blob-instant * {
+  transition: none !important;
+}
