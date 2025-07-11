@@ -334,9 +334,6 @@ function HomePage() {
             {/* Overlay */}
             <div className="absolute inset-0 bg-black/30 pointer-events-none z-20" />
 
-            {/* Navigation */}
-            <Navigation forceWhite />
-
             {/* Main Content */}
             <div className="relative z-30 flex flex-col items-center justify-center min-h-screen px-6 pointer-events-none">
               <div className="text-center">
@@ -502,43 +499,29 @@ function ProductsScrollSectionLanding() {
         />
       ))}
       <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
-      <div className="absolute left-10 top-1/2 -translate-y-1/2 z-20" style={{ pointerEvents: "none" }}></div>
-      <div
-        className="absolute right-10 top-1/2 -translate-y-1/2 flex flex-col items-end gap-2 z-20"
-        style={{ pointerEvents: "none" }}
-      >
+      <div className="absolute left-10 top-1/2 -translate-y-1/2 z-20 max-w-[60%] sm:max-w-none pointer-events-none">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white drop-shadow-lg leading-tight" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+          Build with the<br />Eurus Ecosystem.
+        </h2>
+      </div>
+      <div className="absolute right-10 top-1/2 -translate-y-1/2 flex flex-col items-end gap-2 z-20 pointer-events-none">
         {products.map((p, i) => (
           <span
             key={p.name}
-            className={`text-5xl md:text-7xl font-bold transition-all duration-300 text-right ${current === i ? "text-yellow-200" : "text-white/80"}`}
-            style={{ fontFamily: "var(--font-sf-pro)", opacity: current === i ? 1 : 0.7 }}
+            className={`text-5xl md:text-7xl font-bold transition-all duration-500 ease-in-out text-right no-underline hover:scale-105 ${
+              current === i ? "text-yellow-200" : "text-white/80 hover:text-white"
+            }`}
+            style={{
+              fontFamily: "var(--font-sf-pro)",
+              opacity: current === i ? 1 : 0.7,
+              pointerEvents: "auto",
+              textDecoration: "none",
+              transform: current === i ? "scale(1.02)" : "scale(1)",
+            }}
           >
             {p.name}
           </span>
         ))}
-      </div>
-      <div className="absolute inset-0 w-full h-full z-30" style={{ pointerEvents: "auto" }}>
-        <div className="h-full w-full flex flex-col justify-center items-center">
-          <div
-            className="w-full h-full overflow-y-auto scroll-snap-y-mandatory"
-            style={{ scrollSnapType: "y mandatory", height: "100%" }}
-            onScroll={(e) => {
-              const container = e.currentTarget
-              const vh = container.offsetHeight
-              const scrollY = container.scrollTop
-              const idx = Math.round(scrollY / vh)
-              if (idx !== current && idx >= 0 && idx < products.length) setCurrent(idx)
-            }}
-          >
-            {products.map((_, idx) => (
-              <div
-                key={idx}
-                className="w-full h-full scroll-snap-align-start"
-                style={{ scrollSnapAlign: "start", height: "100%" }}
-              />
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   )
@@ -574,211 +557,178 @@ function ProductsScrollSectionStudioLanding() {
   ]
 
   const [current, setCurrent] = React.useState(0)
-  const [isFullyVisible, setIsFullyVisible] = React.useState(false)
-  const [hasStartedScrolling, setHasStartedScrolling] = React.useState(false)
   const containerRef = React.useRef<HTMLDivElement>(null)
   const isScrollingRef = React.useRef(false)
   const scrollTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
-  const isReleasingScrollRef = React.useRef(false)
+  const [isTransitioning, setIsTransitioning] = React.useState(false)
+  const [isInView, setIsInView] = React.useState(false)
 
-  // Scroll direction tracking for intelligent snapping
-  const [scrollDirection, setScrollDirection] = React.useState<"up" | "down">("down")
-  const lastScrollY = React.useRef(0)
+  // Touch support for mobile
+  const touchStartRef = React.useRef<number>(0);
+  const touchEndRef = React.useRef<number>(0);
 
-  // Track scroll direction
-  React.useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      if (currentScrollY > lastScrollY.current) {
-        setScrollDirection("down")
-      } else {
-        setScrollDirection("up")
-      }
-      lastScrollY.current = currentScrollY
-    }
-
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
-  // Effect to lock and unlock body scroll
-  React.useEffect(() => {
-    const originalOverflow = document.body.style.overflow
-    if (isFullyVisible && !isReleasingScrollRef.current) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = originalOverflow
-    }
-    return () => {
-      document.body.style.overflow = originalOverflow
-    }
-  }, [isFullyVisible])
-
-  // Simplified and smooth wheel handler
-  const handleGlobalWheel = React.useCallback(
+  // Enhanced wheel handler
+  const handleWheel = React.useCallback(
     (e: WheelEvent) => {
-      // If we're releasing scroll, don't interfere
-      if (isReleasingScrollRef.current) {
-        return
+      if (!isInView) return;
+      
+      const direction = e.deltaY > 0 ? 1 : -1;
+      
+      // ONLY allow page scroll when at Draft and scrolling down
+      if (current === products.length - 1 && direction > 0) {
+        return; // Allow normal page scroll to next section
       }
-
-      // Prevent any scrolling if we're currently transitioning
-      if (isScrollingRef.current) {
-        e.preventDefault()
-        e.stopPropagation()
-        return
-      }
-
-      // Always prevent default page scrolling when in this section
-      e.preventDefault()
-      e.stopPropagation()
-
-      const direction = e.deltaY > 0 ? 1 : -1
-      const newIndex = current + direction
-
-      // Handle boundary conditions
-      if (newIndex < 0) {
-        // Scroll up from Eidos: allow page scroll to previous section
-        isReleasingScrollRef.current = true
-        setIsFullyVisible(false)
-        document.body.style.overflow = ""
+      
+      // ALWAYS prevent page scroll in all other cases
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Only cycle products if scrolling within the container
+      if (!containerRef.current?.contains(e.target as Node)) return;
+      
+      if (isScrollingRef.current || isTransitioning) return;
+      
+      const newIndex = current + direction;
+      
+      // Update if within bounds
+      if (newIndex >= 0 && newIndex < products.length) {
+        isScrollingRef.current = true;
+        setIsTransitioning(true);
+        setCurrent(newIndex);
         
-        setTimeout(() => {
-          isReleasingScrollRef.current = false
-        }, 1000)
-        return
-      }
-
-      if (newIndex >= products.length) {
-        // Scroll down from Draft: allow page scroll to next section
-        isReleasingScrollRef.current = true
-        setIsFullyVisible(false)
-        document.body.style.overflow = ""
-        
-        setTimeout(() => {
-          isReleasingScrollRef.current = false
-        }, 1000)
-        return
-      }
-
-      // Valid internal navigation
-      if (newIndex >= 0 && newIndex < products.length && newIndex !== current) {
-        isScrollingRef.current = true
-        setCurrent(newIndex)
-
-        if (current === 0 && direction > 0) {
-          setHasStartedScrolling(true)
-        }
-
         // Clear existing timeout
         if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current)
+          clearTimeout(scrollTimeoutRef.current);
         }
-
-        // Reset scrolling flag after animation - longer timeout for smoother experience
+        
+        // Reset scrolling flag after animation
         scrollTimeoutRef.current = setTimeout(() => {
-          isScrollingRef.current = false
-        }, 800) // Longer timeout to prevent rapid scrolling
+          isScrollingRef.current = false;
+          setIsTransitioning(false);
+        }, 600);
       }
     },
-    [current, products.length],
-  )
+    [current, products.length, isTransitioning, isInView]
+  );
 
-  // Intersection Observer to detect when the component is in view and auto-snap
-  React.useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const intersectionRatio = entry.intersectionRatio
-        const isIntersecting = entry.isIntersecting
-
-        // Reset to Eidos when section first becomes visible
-        if (isIntersecting && intersectionRatio > 0.1 && !isFullyVisible) {
-          setCurrent(0)
-          setHasStartedScrolling(false)
-        }
-
-        // Auto-snap to full view when 50% visible
-        if (
-          isIntersecting &&
-          intersectionRatio >= 0.5 &&
-          intersectionRatio < 0.95 &&
-          !isFullyVisible &&
-          !isReleasingScrollRef.current
-        ) {
-          // Smooth scroll to make the section fully visible
-          containerRef.current?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          })
-
-          // Always start with Eidos when coming from above (Eurus Studio section)
-          setCurrent(0)
-          setHasStartedScrolling(false)
-          return
-        }
-
-        // Set fully visible when 95% or more is visible
-        if (
-          intersectionRatio >= 0.95 &&
-          !isFullyVisible &&
-          !isReleasingScrollRef.current
-        ) {
-          setIsFullyVisible(true)
-          // ALWAYS ensure we start with Eidos when becoming fully visible from any direction
-          setCurrent(0)
-          setHasStartedScrolling(false)
-        } else if (intersectionRatio < 0.3 && isFullyVisible) {
-          // Only reset if we're actually leaving the section (less than 30% visible)
-          setTimeout(() => {
-            if (
-              !containerRef.current ||
-              containerRef.current.getBoundingClientRect().top > window.innerHeight ||
-              containerRef.current.getBoundingClientRect().bottom < 0
-            ) {
-              setIsFullyVisible(false)
-              setCurrent(0)
-              setHasStartedScrolling(false)
-              isReleasingScrollRef.current = false
-            }
-          }, 100)
-        }
-      },
-      {
-        threshold: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95], // Multiple thresholds for precise detection
-      },
-    )
-
-    const currentRef = containerRef.current
-    if (currentRef) {
-      observer.observe(currentRef)
-    }
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef)
+  // Keyboard navigation
+  const handleKeyDown = React.useCallback(
+    (e: KeyboardEvent) => {
+      if (!isInView || isScrollingRef.current || isTransitioning) return;
+      
+      let newIndex = current;
+      
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        newIndex = Math.max(0, current - 1);
+        e.preventDefault();
+      } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        newIndex = Math.min(products.length - 1, current + 1);
+        e.preventDefault();
       }
-    }
-  }, [isFullyVisible, scrollDirection, current])
+      
+      if (newIndex !== current) {
+        isScrollingRef.current = true;
+        setIsTransitioning(true);
+        setCurrent(newIndex);
+        
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+        }
+        
+        scrollTimeoutRef.current = setTimeout(() => {
+          isScrollingRef.current = false;
+          setIsTransitioning(false);
+        }, 600);
+      }
+    },
+    [current, products.length, isTransitioning, isInView]
+  );
 
-  // Add/remove the wheel event listener based on visibility
+  const handleTouchStart = React.useCallback((e: TouchEvent) => {
+    if (!isInView) return;
+    touchStartRef.current = e.touches[0].clientY;
+  }, [isInView]);
+
+  const handleTouchEnd = React.useCallback(
+    (e: TouchEvent) => {
+      if (!isInView || isScrollingRef.current || isTransitioning) return;
+      
+      touchEndRef.current = e.changedTouches[0].clientY;
+      const diff = touchStartRef.current - touchEndRef.current;
+      
+      if (Math.abs(diff) > 50) { // Minimum swipe distance
+        const direction = diff > 0 ? 1 : -1;
+        const newIndex = current + direction;
+        
+        if (newIndex >= 0 && newIndex < products.length) {
+          e.preventDefault();
+          isScrollingRef.current = true;
+          setIsTransitioning(true);
+          setCurrent(newIndex);
+          
+          if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current);
+          }
+          
+          scrollTimeoutRef.current = setTimeout(() => {
+            isScrollingRef.current = false;
+            setIsTransitioning(false);
+          }, 600);
+        }
+      }
+    },
+    [current, products.length, isTransitioning, isInView]
+  );
+
+  // Fullscreen detection
   React.useEffect(() => {
-    if (isFullyVisible && !isReleasingScrollRef.current) {
-      window.addEventListener("wheel", handleGlobalWheel, { passive: false })
-    }
+    const checkInView = () => {
+      const el = containerRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const inView = Math.abs(rect.top) < 10 && Math.abs(rect.height - vh) < 10;
+      setIsInView(inView);
+    };
+    
+    checkInView();
+    window.addEventListener('scroll', checkInView, { passive: true });
+    window.addEventListener('resize', checkInView);
+    
     return () => {
-      window.removeEventListener("wheel", handleGlobalWheel)
-    }
-  }, [isFullyVisible, handleGlobalWheel])
+      window.removeEventListener('scroll', checkInView);
+      window.removeEventListener('resize', checkInView);
+    };
+  }, []);
 
-  // Cleanup timeout on unmount
+  // Event listeners
+  React.useEffect(() => {
+    const wheelHandler = (e: WheelEvent) => handleWheel(e);
+    const keyHandler = (e: KeyboardEvent) => handleKeyDown(e);
+    const touchStartHandler = (e: TouchEvent) => handleTouchStart(e);
+    const touchEndHandler = (e: TouchEvent) => handleTouchEnd(e);
+    
+    window.addEventListener('wheel', wheelHandler, { passive: false });
+    window.addEventListener('keydown', keyHandler);
+    window.addEventListener('touchstart', touchStartHandler, { passive: true });
+    window.addEventListener('touchend', touchEndHandler, { passive: false });
+    
+    return () => {
+      window.removeEventListener('wheel', wheelHandler);
+      window.removeEventListener('keydown', keyHandler);
+      window.removeEventListener('touchstart', touchStartHandler);
+      window.removeEventListener('touchend', touchEndHandler);
+    };
+  }, [handleWheel, handleKeyDown, handleTouchStart, handleTouchEnd]);
+
+  // Cleanup
   React.useEffect(() => {
     return () => {
       if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current)
+        clearTimeout(scrollTimeoutRef.current);
       }
-      // Reset all scroll-related refs
-      isReleasingScrollRef.current = false
-    }
-  }, [])
+    };
+  }, []);
 
   return (
     <div ref={containerRef} id="products-scroll-viewport-landing" className="w-full h-screen relative overflow-hidden scroll-snap-section">
@@ -787,7 +737,7 @@ function ProductsScrollSectionStudioLanding() {
         <video
           key={product.name}
           src={product.videoSrc}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-in-out z-0 ${
+          className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out z-0 ${
             current === idx ? "opacity-100" : "opacity-0"
           }`}
           style={{ pointerEvents: "none" }}
@@ -806,6 +756,7 @@ function ProductsScrollSectionStudioLanding() {
         </h2>
       </div>
       
+      {/* Product names */}
       <div className="absolute right-10 top-1/2 -translate-y-1/2 flex flex-col items-end gap-2 z-20 pointer-events-none">
         {products.map((p, i) =>
           p.link.startsWith("http") ? (
@@ -814,7 +765,7 @@ function ProductsScrollSectionStudioLanding() {
               href={p.link}
               target="_blank"
               rel="noopener noreferrer"
-              className={`text-5xl md:text-7xl font-bold transition-all duration-500 ease-in-out text-right no-underline hover:scale-105 ${
+              className={`text-5xl md:text-7xl font-bold transition-all duration-700 ease-out text-right no-underline hover:scale-105 ${
                 current === i ? "text-yellow-200" : "text-white/80 hover:text-white"
               }`}
               style={{
@@ -831,7 +782,7 @@ function ProductsScrollSectionStudioLanding() {
             <Link
               key={p.name}
               href={p.link}
-              className={`text-5xl md:text-7xl font-bold transition-all duration-500 ease-in-out text-right no-underline hover:scale-105 ${
+              className={`text-5xl md:text-7xl font-bold transition-all duration-700 ease-out text-right no-underline hover:scale-105 ${
                 current === i ? "text-yellow-200" : "text-white/80 hover:text-white"
               }`}
               style={{
@@ -847,6 +798,25 @@ function ProductsScrollSectionStudioLanding() {
           ),
         )}
       </div>
+      
+      {/* Progress indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+        {products.map((_, i) => (
+          <div
+            key={i}
+            className={`w-2 h-2 rounded-full transition-all duration-500 ${
+              current === i ? "bg-yellow-200 w-8" : "bg-white/40"
+            }`}
+          />
+        ))}
+      </div>
+      
+      {/* Scroll hint */}
+      {current === 0 && (
+        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 text-white/60 text-sm z-20 animate-pulse">
+          Scroll to explore products
+        </div>
+      )}
     </div>
   )
 }
