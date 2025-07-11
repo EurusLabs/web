@@ -92,29 +92,6 @@ function EarningsContent() {
           >
             How do we calculate this?
           </button>
-
-          {/* Get Started Button */}
-          <div className="mb-16">
-            <Button
-              asChild
-              className="transition-colors border-none"
-              style={{
-                backgroundColor: "#000000CC",
-                color: "white",
-                fontFamily: "var(--font-sf-pro)",
-                fontWeight: 590,
-                fontSize: "18px",
-                lineHeight: "100%",
-                letterSpacing: "0%",
-                padding: "16px 48px",
-                width: "500px",
-                borderRadius: "50px",
-                height: "60px",
-              }}
-            >
-              <Link href="/get-started">Get Started</Link>
-            </Button>
-          </div>
         </div>
 
         {/* Creator Card - keeping from original home page */}

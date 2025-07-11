@@ -1,7 +1,8 @@
 "use client"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { LayoutList, LayoutGrid, SlidersHorizontal } from "lucide-react" // Removed ArrowUpDown
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { PublicationCard } from "@/components/publication-card"
@@ -18,9 +19,17 @@ import {
 import Navigation from "../components/navigation"
 
 export default function PublicationsPage() {
-  const [activeCategory, setActiveCategory] = useState("all")
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get("category") || "all";
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
   // Removed sortOrder and setSortOrder state
   const [viewMode, setViewMode] = useState<"list" | "grid">("grid") // Default to grid view
+
+  // Sync activeCategory with URL query param whenever it changes
+  useEffect(() => {
+    const newCategory = searchParams.get("category") || "all";
+    setActiveCategory(newCategory);
+  }, [searchParams]);
 
   const sortedAndFilteredPublications = useMemo(() => {
     const filtered = publicationsData.filter((pub) => {
@@ -139,14 +148,22 @@ export default function PublicationsPage() {
                   <img src={publication.image} alt={publication.title} className="object-cover w-full h-full rounded-lg" />
                 </div>
                 <div className="text-2xl font-semibold text-foreground mb-2" style={{ fontFamily: 'var(--font-sf-pro)' }}>{publication.title}</div>
-                <div className="text-base text-muted-foreground mb-4">{publication.type} {publication.date}</div>
+                <div className="flex flex-row gap-2 text-base text-muted-foreground mb-4 items-center">
+                  <span>{publication.type}</span>
+                  <span>|</span>
+                  <span>{publication.date}</span>
+                </div>
               </Link>
             ) : (
               <Link key={publication.id} href={`/publications/${publication.id}`} className="flex items-center gap-6 group no-underline hover:no-underline focus:no-underline" style={{ textDecoration: 'none' }}>
                 <img src={publication.image} alt={publication.title} className="w-32 h-32 object-cover rounded-lg flex-shrink-0" />
                 <div>
                   <div className="text-xl font-semibold text-foreground mb-1" style={{ fontFamily: 'var(--font-sf-pro)' }}>{publication.title}</div>
-                  <div className="text-base text-muted-foreground">{publication.type} {publication.date}</div>
+                  <div className="flex flex-row gap-2 text-base text-muted-foreground items-center">
+                    <span>{publication.type}</span>
+                    <span>|</span>
+                    <span>{publication.date}</span>
+                  </div>
                 </div>
               </Link>
             )

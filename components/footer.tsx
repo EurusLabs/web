@@ -36,7 +36,7 @@ export default function Footer() {
       <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 flex flex-col gap-3 sm:gap-4">
         {/* Documents row - top right */}
         <div className="flex flex-row w-full justify-end items-start">
-          <a href="https://eurus-labs.gitbook.io/eurus-labs/getting-started/quickstart" target="_blank" rel="noopener noreferrer" className="font-semibold text-sm sm:text-base opacity-80 hover:opacity-100 hover:underline">Documents</a>
+          <a href="https://eurus-labs.gitbook.io/eurus-labs/~/changes/3/system_status" target="_blank" rel="noopener noreferrer" className="font-semibold text-sm sm:text-base opacity-80 hover:opacity-100 hover:underline">Documents</a>
         </div>
         {/* Verticals - Mobile: Stack vertically, Desktop: Horizontal */}
         <div className="flex flex-col sm:flex-row items-start gap-6 sm:gap-8 md:gap-12 text-left">
@@ -51,8 +51,7 @@ export default function Footer() {
           {/* Company vertical */}
           <div className="flex flex-col items-start gap-1 sm:gap-2">
             <div className="font-bold text-base sm:text-lg">COMPANY</div>
-            <a href="https://eurus-labs.gitbook.io/eurus-labs/getting-started/quickstart" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">About</a>
-            <a href="/careers" className="text-sm sm:text-base hover:underline">Careers</a>
+            <a href="https://eurus-labs.gitbook.io/eurus-labs/~/changes/3/system_status" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">About</a>
             <a href="/contact" className="text-sm sm:text-base hover:underline">Contact</a>
           </div>
           {/* Social vertical */}

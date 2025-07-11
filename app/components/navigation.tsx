@@ -113,16 +113,6 @@ export default function Navigation({ forceWhite = false }: NavigationProps) {
             )}
           </button>
         </div>
-        
-        <Link 
-          href="/get-started" 
-          className={clsx(
-            "px-6 py-2 rounded-full font-semibold text-base transition-all duration-300 hidden sm:inline-block",
-            'bg-white text-black hover:bg-white/80'
-          )}
-        >
-          Get Started
-        </Link>
       </div>
 
       {/* Slide-out menu */}
@@ -137,7 +127,7 @@ export default function Navigation({ forceWhite = false }: NavigationProps) {
           {[
             { label: "Product", isDropdown: true, items: [
               { name: "Eidos", href: "https://apps.apple.com/us/app/eidos-press/id6742799522", external: true },
-              { name: "Studio", href: "/eurus-studio" },
+              { name: "Studio", href: "https://studio.euruslabs.com/", external: true },
               { name: "Draft", href: "https://red-forest-0721f660f.6.azurestaticapps.net/" },
               { name: "Relay", href: "https://www.relayedstories.com/", external: true }
             ]},
@@ -159,7 +149,7 @@ export default function Navigation({ forceWhite = false }: NavigationProps) {
               style={{ transitionDelay: menuOpen ? `${(index + 1) * 100}ms` : '0ms' }}
             >
               {item.isDropdown ? (
-                <AnimatedDropdown label={item.label} items={item.items} />
+                <AnimatedDropdown label={item.label} items={item.items} onNavigate={() => setMenuOpen(false)} />
               ) : (
                 <Link
                   href={item.href || '#'}
@@ -179,7 +169,7 @@ export default function Navigation({ forceWhite = false }: NavigationProps) {
 }
 
 // Animated dropdown component
-function AnimatedDropdown({ label, items }: { label: string, items: Array<{name: string, href: string, external?: boolean}> }) {
+function AnimatedDropdown({ label, items, onNavigate }: { label: string, items: Array<{name: string, href: string, external?: boolean}>, onNavigate: () => void }) {
   const [open, setOpen] = useState(false)
   
   return (
@@ -213,6 +203,7 @@ function AnimatedDropdown({ label, items }: { label: string, items: Array<{name:
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block text-base py-2 px-3 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all duration-200"
+                  onClick={onNavigate}
                 >
                   {item.name}
                 </a>
@@ -220,6 +211,7 @@ function AnimatedDropdown({ label, items }: { label: string, items: Array<{name:
                 <Link
                   href={item.href}
                   className="block text-base py-2 px-3 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all duration-200"
+                  onClick={onNavigate}
                 >
                   {item.name}
                 </Link>

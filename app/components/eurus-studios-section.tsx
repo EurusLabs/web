@@ -24,9 +24,8 @@ export function EurusStudiosSection() {
         <h2 className="text-4xl md:text-5xl font-bold text-center" style={{ fontFamily: 'var(--font-sf-pro)' }}>
           Introducing Eurus Studio.
         </h2>
-        <a href="/eurus-studio" className="text-base font-medium text-foreground bg-card/40 px-6 py-2 rounded-full flex items-center justify-center mx-auto hover:bg-card/60 transition-all no-underline" style={{ fontFamily: 'var(--font-sf-pro)', textDecoration: 'none' }}>
-          Learn More
-          <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+        <a href="https://studio.euruslabs.com/" target="_blank" rel="noopener noreferrer" className="text-base font-medium text-foreground bg-card/40 px-6 py-2 rounded-full flex items-center justify-center mx-auto hover:bg-card/60 transition-all no-underline" style={{ fontFamily: 'var(--font-sf-pro)' }}>
+          Try Studio
         </a>
       </div>
     </div>

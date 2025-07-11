@@ -91,29 +91,6 @@ function ResultsContent() {
               How do we calculate this?
             </button>
           </div>
-
-          {/* Get Started Button */}
-          <div className="relative">
-            <Button
-              onClick={handleGetStarted}
-              className="transition-colors border-none"
-              style={{
-                backgroundColor: "#000000CC",
-                color: "white",
-                fontFamily: "var(--font-sf-pro)",
-                fontWeight: 590,
-                fontSize: "18px",
-                lineHeight: "100%",
-                letterSpacing: "0%",
-                padding: "16px 48px",
-                width: "300px",
-                borderRadius: "50px",
-                height: "60px",
-              }}
-            >
-              Get Started
-            </Button>
-          </div>
         </div>
 
         {/* Bottom Text */}

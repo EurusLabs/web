@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://euruslabs.com/sitemap.xml
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /private/
+Disallow: /api/
+
+# Allow important pages
+Allow: /publications/
+Allow: /research/
+Allow: /creators/
+Allow: /discover/
+Allow: /earnings/
+Allow: /results/
+Allow: /get-started/
+Allow: /contact/
+Allow: /manifesto/
+
+# Crawl delay (optional)
+Crawl-delay: 1 

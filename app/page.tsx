@@ -563,7 +563,7 @@ function ProductsScrollSectionStudioLanding() {
       name: "Studio",
       videoSrc: "https://eurusworkflows.blob.core.windows.net/eurusworkflows/images/abstract3.mp4",
       description: "Studio is a powerful AI for video understanding and creative editing.",
-      link: "https://kind-mud-06307e40f.2.azurestaticapps.net",
+      link: "https://studio.euruslabs.com/",
     },
     {
       name: "Draft",

@@ -8,8 +8,8 @@ export async function generateStaticParams() {
   return publicationsData.map((publication) => ({ id: publication.id }))
 }
 
-export default function ResearchPostPage({ params }: { params: { id: string } }) {
-  const { id } = params
+export default async function ResearchPostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
 
   return (
     <div className="min-h-screen bg-background text-foreground">
