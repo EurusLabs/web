@@ -574,12 +574,12 @@ function ProductsScrollSectionStudioLanding() {
       
       const direction = e.deltaY > 0 ? 1 : -1;
       
-      // ONLY allow page scroll when at Draft and scrolling down
-      if (current === products.length - 1 && direction > 0) {
+      // ONLY allow page scroll when at Draft (index 3) and scrolling down
+      if (current === 3 && direction > 0) {
         return; // Allow normal page scroll to next section
       }
       
-      // ALWAYS prevent page scroll in all other cases
+      // PREVENT ALL SCROLL EVERYWHERE when section is in view
       e.preventDefault();
       e.stopPropagation();
       
