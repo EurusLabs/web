@@ -5,10 +5,12 @@ import { FaArrowRight } from "react-icons/fa"
 import { useState, useRef } from "react"
 import type { MutableRefObject } from "react"
 import { publicationsData } from "@/components/publications-data"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 export default function Footer() {
   const [videoMuted, setVideoMuted] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const isMobile = useIsMobile()
 
   const handleToggleMute = () => {
     setVideoMuted((prev) => !prev)
@@ -16,6 +18,15 @@ export default function Footer() {
       videoRef.current.muted = !videoRef.current.muted
     }
   }
+
+  const handleStudioClick = (e: React.MouseEvent) => {
+    if (isMobile) {
+      e.preventDefault();
+      alert("Please login on desktop. Studio not available on mobile.");
+      return;
+    }
+    // For desktop users, let the default link behavior work
+  };
 
   return (
     <footer className="relative w-full text-white overflow-hidden" style={{ minHeight: '140px', borderTopLeftRadius: '2.5rem', borderTopRightRadius: '2.5rem', fontFamily: 'var(--font-sf-pro)' }}>
@@ -43,7 +54,15 @@ export default function Footer() {
           {/* Products vertical */}
           <div className="flex flex-col items-start gap-1 sm:gap-2">
             <div className="font-bold text-base sm:text-lg">PRODUCTS</div>
-            <a href="https://kind-mud-06307e40f.2.azurestaticapps.net" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Studio</a>
+            <a 
+              href="https://kind-mud-06307e40f.2.azurestaticapps.net" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              onClick={handleStudioClick}
+              className="text-sm sm:text-base hover:underline cursor-pointer"
+            >
+              Studio
+            </a>
             <a href="https://red-forest-0721f660f.6.azurestaticapps.net/" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Draft</a>
             <a href="https://www.relayedstories.com/" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Relay</a>
             <a href="https://apps.apple.com/us/app/eidos-press/id6742799522" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base hover:underline">Eidos</a>
