@@ -350,7 +350,7 @@ function HomePage() {
                   style={{
                     fontFamily: "var(--font-sf-pro)",
                     fontWeight: 700,
-                    fontSize: "80px",
+                    fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? "78px" : "80px",
                     lineHeight: "100%",
                     letterSpacing: "0%",
                     textAlign: "center",
