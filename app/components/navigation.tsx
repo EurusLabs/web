@@ -92,18 +92,31 @@ export default function Navigation({ forceWhite = false }: NavigationProps) {
         menuOpen ? 'bg-black/95 backdrop-blur-xl shadow-lg' : 'bg-transparent'
       }`}>
         <div className="flex items-center">
+          {/* Animated hamburger button - Mobile first */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="relative w-8 h-8 flex flex-col justify-center items-center focus:outline-none transition-all duration-300 text-white cursor-pointer sm:hidden"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+          >
+            {menuOpen ? (
+              <FiX className="w-6 h-6 text-white" />
+            ) : (
+              <FiMenu className="w-6 h-6 text-white" />
+            )}
+          </button>
+          
           <Link 
             href="/" 
-            className="text-2xl font-medium tracking-normal transition-all duration-300 mr-6 text-white" 
+            className="text-2xl font-medium tracking-normal transition-all duration-300 ml-4 sm:ml-0 sm:mr-6 text-white" 
             style={{ fontFamily: 'var(--font-sf-pro)' }}
           >
             Eurus Labs
           </Link>
           
-          {/* Animated hamburger button */}
+          {/* Animated hamburger button - Desktop */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="relative w-8 h-8 flex flex-col justify-center items-center focus:outline-none transition-all duration-300 text-white cursor-pointer"
+            className="relative w-8 h-8 flex flex-col justify-center items-center focus:outline-none transition-all duration-300 text-white cursor-pointer hidden sm:flex"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
           >
             {menuOpen ? (
