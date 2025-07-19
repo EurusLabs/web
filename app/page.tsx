@@ -299,8 +299,6 @@ function HomePage() {
                   overflow: "hidden",
                 willChange: "transform, left, top, width, height",
                 transform: "translateZ(0)", // Force hardware acceleration
-                willChange: "transform, left, top, width, height",
-                transform: "translateZ(0)", // Force hardware acceleration
                 // Remove all transitions for instant follow
                 }}
               >
@@ -577,6 +575,11 @@ function ProductsScrollSectionStudioLanding() {
   const touchStartRef = React.useRef<number>(0);
   const touchEndRef = React.useRef<number>(0);
 
+  // Ensure we start with Eidos (index 0)
+  React.useEffect(() => {
+    setCurrent(0);
+  }, []);
+
   // Enhanced wheel handler
   const handleWheel = React.useCallback(
     (e: WheelEvent) => {
@@ -592,9 +595,6 @@ function ProductsScrollSectionStudioLanding() {
       // PREVENT ALL SCROLL EVERYWHERE when section is in view
       e.preventDefault();
       e.stopPropagation();
-      
-      // Only cycle products if scrolling within the container
-      if (!containerRef.current?.contains(e.target as Node)) return;
       
       if (isScrollingRef.current || isTransitioning) return;
       
@@ -666,12 +666,13 @@ function ProductsScrollSectionStudioLanding() {
       touchEndRef.current = e.changedTouches[0].clientY;
       const diff = touchStartRef.current - touchEndRef.current;
       
-      if (Math.abs(diff) > 50) { // Minimum swipe distance
+      if (Math.abs(diff) > 30) { // Reduced minimum swipe distance for better mobile response
         const direction = diff > 0 ? 1 : -1;
         const newIndex = current + direction;
         
         if (newIndex >= 0 && newIndex < products.length) {
           e.preventDefault();
+          e.stopPropagation();
           isScrollingRef.current = true;
           setIsTransitioning(true);
           setCurrent(newIndex);
@@ -690,14 +691,19 @@ function ProductsScrollSectionStudioLanding() {
     [current, products.length, isTransitioning, isInView]
   );
 
-  // Fullscreen detection
+  // Improved fullscreen detection for mobile
   React.useEffect(() => {
     const checkInView = () => {
       const el = containerRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
-      const inView = Math.abs(rect.top) < 10 && Math.abs(rect.height - vh) < 10;
+      
+      // More lenient detection for mobile
+      const isMobile = window.innerWidth < 768;
+      const threshold = isMobile ? 50 : 10;
+      
+      const inView = Math.abs(rect.top) < threshold && Math.abs(rect.height - vh) < threshold;
       setIsInView(inView);
     };
     
@@ -711,23 +717,30 @@ function ProductsScrollSectionStudioLanding() {
     };
   }, []);
 
-  // Event listeners
+  // Event listeners with improved mobile support
   React.useEffect(() => {
     const wheelHandler = (e: WheelEvent) => handleWheel(e);
     const keyHandler = (e: KeyboardEvent) => handleKeyDown(e);
     const touchStartHandler = (e: TouchEvent) => handleTouchStart(e);
     const touchEndHandler = (e: TouchEvent) => handleTouchEnd(e);
     
+    // Add touch event listeners to the container for better mobile handling
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('touchstart', touchStartHandler, { passive: true });
+      container.addEventListener('touchend', touchEndHandler, { passive: false });
+    }
+    
     window.addEventListener('wheel', wheelHandler, { passive: false });
     window.addEventListener('keydown', keyHandler);
-    window.addEventListener('touchstart', touchStartHandler, { passive: true });
-    window.addEventListener('touchend', touchEndHandler, { passive: false });
     
     return () => {
+      if (container) {
+        container.removeEventListener('touchstart', touchStartHandler);
+        container.removeEventListener('touchend', touchEndHandler);
+      }
       window.removeEventListener('wheel', wheelHandler);
       window.removeEventListener('keydown', keyHandler);
-      window.removeEventListener('touchstart', touchStartHandler);
-      window.removeEventListener('touchend', touchEndHandler);
     };
   }, [handleWheel, handleKeyDown, handleTouchStart, handleTouchEnd]);
 
@@ -824,7 +837,7 @@ function ProductsScrollSectionStudioLanding() {
       {/* Scroll hint */}
       {current === 0 && (
         <div className="absolute bottom-20 left-1/2 -translate-x-1/2 text-white/60 text-sm z-20 animate-pulse">
-          Scroll to explore products
+          {typeof window !== 'undefined' && window.innerWidth < 768 ? 'Swipe to explore products' : 'Scroll to explore products'}
         </div>
       )}
     </div>
